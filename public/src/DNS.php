@@ -7,6 +7,13 @@ namespace CVerify;
 use RuntimeException;
 use InvalidArgumentException;
 
+// Polyfill for PHP < 8.0
+if (!function_exists('CVerify\str_starts_with')) {
+    function str_starts_with(string $haystack, string $needle): bool {
+        return $needle === '' || strncmp($haystack, $needle, strlen($needle)) === 0;
+    }
+}
+
 // Previene ridefinizione se già caricata (fix per OPcache)
 if (class_exists('CVerify\\DNS', false)) {
     return;

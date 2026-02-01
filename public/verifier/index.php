@@ -1,7 +1,7 @@
 <?php
 /**
  * CVerify - Verifier Lens
- * Portale pubblico per verificare le credenziali professionali.
+ * Public portal to verify professional credentials.
  */
 declare(strict_types=1);
 
@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
     try {
         $url = trim($_POST['url'] ?? '');
         if (empty($url)) {
-            throw new Exception('URL del profilo richiesto');
+            throw new Exception('Profile URL required');
         }
         
         // Fetch CV JSON
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
 
 function fetchCV(string $url): array {
     if (!filter_var($url, FILTER_VALIDATE_URL)) {
-        throw new Exception('URL non valido');
+        throw new Exception('Invalid URL');
     }
     
     $context = stream_context_create([
@@ -88,12 +88,12 @@ function fetchCV(string $url): array {
     
     $response = @file_get_contents($url, false, $context);
     if ($response === false) {
-        throw new Exception('Impossibile scaricare il profilo');
+        throw new Exception('Unable to download profile');
     }
     
     $data = json_decode($response, true);
     if (!$data) {
-        throw new Exception('JSON non valido');
+        throw new Exception('JSON not valid');
     }
     
     return $data;
@@ -103,7 +103,7 @@ function verifyUserIdentity(?string $domain): array {
     $result = ['verified' => false, 'domain' => $domain, 'errors' => []];
     
     if (empty($domain)) {
-        $result['errors'][] = 'Dominio mancante';
+        $result['errors'][] = 'Domain missing';
         return $result;
     }
     
@@ -130,7 +130,7 @@ function verifyAttestation(array $attestation): array {
     ];
     
     if (empty($result['issuer_domain'])) {
-        $result['errors'][] = 'Issuer domain mancante';
+        $result['errors'][] = 'Issuer domain missing';
         return $result;
     }
     
@@ -164,7 +164,7 @@ function verifyAttestation(array $attestation): array {
                 ];
             }
         } else {
-            $result['errors'][] = 'Chiave pubblica issuer non trovata nel DNS';
+            $result['errors'][] = 'Public key issuer not found in DNS';
             $result['public_key_found'] = false;
         }
     } catch (Exception $e) {
@@ -201,7 +201,7 @@ include __DIR__ . '/../includes/header.php';
                 Verifier <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Lens</span>
             </h1>
             <p class="text-navy-300 text-lg max-w-2xl mx-auto mb-10">
-                Verifica crittograficamente le credenziali professionali di qualsiasi utente CVerify.
+                Cryptographically verify professional credentials of any CVerify user.
             </p>
             
             <!-- Search Box -->
@@ -247,15 +247,15 @@ include __DIR__ . '/../includes/header.php';
             <div class="grid grid-cols-3 gap-4">
                 <div class="glass-card rounded-xl p-4 text-center">
                     <div id="statTotal" class="text-3xl font-bold text-white">0</div>
-                    <div class="text-xs text-navy-400">Esperienze</div>
+                    <div class="text-xs text-navy-400">Experiences</div>
                 </div>
                 <div class="glass-card rounded-xl p-4 text-center verified-glow">
                     <div id="statVerified" class="text-3xl font-bold text-emerald-400">0</div>
-                    <div class="text-xs text-navy-400">Verificate</div>
+                    <div class="text-xs text-navy-400">Verified</div>
                 </div>
                 <div class="glass-card rounded-xl p-4 text-center pending-glow">
                     <div id="statPending" class="text-3xl font-bold text-yellow-400">0</div>
-                    <div class="text-xs text-navy-400">Non Verificate</div>
+                    <div class="text-xs text-navy-400">Unverified</div>
                 </div>
             </div>
 
@@ -281,7 +281,7 @@ include __DIR__ . '/../includes/header.php';
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="text-navy-400 mt-4">Verifica in corso...</p>
+            <p class="text-navy-400 mt-4">Verification in progress...</p>
         </div>
 
         <!-- Error State -->
@@ -291,7 +291,7 @@ include __DIR__ . '/../includes/header.php';
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </div>
-            <h3 class="text-xl font-bold text-white mb-2">Errore di Verifica</h3>
+            <h3 class="text-xl font-bold text-white mb-2">Verification Error</h3>
             <p id="errorMessage" class="text-navy-400">-</p>
         </div>
     </main>
@@ -374,7 +374,7 @@ include __DIR__ . '/../includes/header.php';
             } else {
                 document.getElementById('identityBadge').className = 'status-pending px-4 py-2 rounded-xl text-sm font-medium';
                 document.getElementById('identityBadge').textContent = 'DNS Not Verified';
-                document.getElementById('identityStatus').textContent = data.identity.errors.join(', ') || 'DNS non configurato';
+                document.getElementById('identityStatus').textContent = data.identity.errors.join(', ') || 'DNS not configured';
             }
             
             // Stats
@@ -387,7 +387,7 @@ include __DIR__ . '/../includes/header.php';
             list.innerHTML = '';
             
             if (data.experiences.length === 0) {
-                list.innerHTML = '<div class="p-8 text-center text-navy-400">Nessuna esperienza nel profilo</div>';
+                list.innerHTML = '<div class="p-8 text-center text-navy-400">No experience in profile</div>';
                 return;
             }
             

@@ -238,10 +238,10 @@ include __DIR__ . '/../includes/header.php';
                 
                 <div>
                     <label class="block text-sm font-medium text-navy-300 mb-2">
-                        Passphrase <span class="text-navy-500 font-normal">(se la chiave è protetta)</span>
+                        Passphrase <span class="text-navy-500 font-normal">(if key is protected)</span>
                     </label>
                     <input type="password" id="passphraseInput" 
-                           placeholder="Lascia vuoto se non protetta"
+                           placeholder="Leave empty if not protected"
                            class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-navy-500">
                 </div>
                 
@@ -250,11 +250,11 @@ include __DIR__ . '/../includes/header.php';
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                     </svg>
-                    <span>Accedi</span>
+                    <span>Login</span>
                 </button>
                 
                 <button onclick="goBack()" class="btn-secondary w-full px-4 py-3 rounded-xl text-white font-medium">
-                    ← Torna indietro
+                    ← Go Back
                 </button>
             </div>
             
@@ -365,12 +365,12 @@ async function checkDNSAndGenerateChallenge() {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="font-medium">DNS Verificato</span>
+                <span class="font-medium">DNS Verified</span>
             </div>
         `;
         
         // Generate challenge
-        console.log('%c[Step 4] Generazione challenge crittografico...', 'color: #fbbf24;');
+        console.log('%c[Step 4] Generating cryptographic challenge...', 'color: #fbbf24;');
         const challengeRes = await fetch('', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
@@ -465,16 +465,16 @@ async function authenticate() {
         
         const data = await res.json();
         
-        console.log('%c[Auth Step 4] Risposta server:', 'color: #34d399;');
+        console.log('%c[Auth Step 4] Server response:', 'color: #34d399;');
         console.log('Success:', data.success);
-        if (data.error) console.error('Errore:', data.error);
-        if (data.session) console.log('Sessione creata:', data.session);
+        if (data.error) console.error('Error:', data.error);
+        if (data.session) console.log('Session created:', data.session);
         
         if (data.success) {
-            console.log('%c✅ AUTENTICAZIONE RIUSCITA!', 'color: #10b981; font-weight: bold; font-size: 16px;');
+            console.log('%c✅ AUTHENTICATION SUCCESSFUL!', 'color: #10b981; font-weight: bold; font-size: 16px;');
             console.timeEnd('Authentication Duration');
             console.groupEnd();
-            showMessage('Autenticazione riuscita! Reindirizzamento...', 'success');
+            showMessage('Authentication successful! Redirecting...', 'success');
             setTimeout(() => {
                 window.location.href = 'dashboard.php';
             }, 1000);

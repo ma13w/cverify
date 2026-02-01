@@ -180,7 +180,7 @@ include __DIR__ . '/../includes/header.php';
                     </svg>
                 </div>
                 <h1 class="text-2xl font-bold text-white">Company Login</h1>
-                <p class="text-navy-400 mt-2">Accedi con la chiave privata aziendale</p>
+                <p class="text-navy-400 mt-2">Login with company private key</p>
             </div>
             
             <!-- Step 1: Domain Input -->
@@ -232,7 +232,7 @@ include __DIR__ . '/../includes/header.php';
                         Passphrase <span class="text-navy-500 font-normal">(se la chiave è protetta)</span>
                     </label>
                     <input type="password" id="passphraseInput" 
-                           placeholder="Lascia vuoto se non protetta"
+                           placeholder="Leave empty if not protected"
                            class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-navy-500">
                 </div>
                 
@@ -256,8 +256,8 @@ include __DIR__ . '/../includes/header.php';
         <!-- Security Notice -->
         <div class="mt-6 text-center">
             <p class="text-navy-500 text-sm">
-                🔒 La chiave privata viene usata solo localmente per firmare il challenge.<br>
-                Non viene mai inviata al server.
+                🔒 The private key is used only locally to sign the challenge.<br>
+                It is never sent to the server.
             </p>
         </div>
     </div>
@@ -347,7 +347,7 @@ async function checkDNSAndGenerateChallenge() {
             return;
         }
         
-        console.log('%c✅ DNS AZIENDALE VERIFICATO!', 'color: #10b981; font-weight: bold;');
+        console.log('%c✅ COMPANY DNS VERIFIED!', 'color: #10b981; font-weight: bold;');
         console.timeEnd('Company DNS Check Duration');
         
         contentDiv.className = 'rounded-xl p-4 bg-emerald-500/20 border border-emerald-500/30';

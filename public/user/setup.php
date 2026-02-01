@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $passphrase = $_POST['passphrase'] ?? '';
 
             if (empty($domain)) {
-                $message = 'Il dominio è obbligatorio.';
+                $message = 'Domain is required.';
                 $messageType = 'error';
                 break;
             }
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $messageType = 'success';
                 
             } catch (Exception $e) {
-                $message = 'Errore nella generazione delle chiavi: ' . $e->getMessage();
+                $message = 'Error in key generation: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
@@ -130,14 +130,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'public_key' => $dns->generateDnsRecordsForKey($publicKey),
                 ];
             } catch (Exception $e) {
-                $message = 'Errore: ' . $e->getMessage();
+                $message = 'Error: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
 
         case 'verify_dns':
             if (empty($config['domain'])) {
-                $message = 'Nessun dominio configurato.';
+                $message = 'No domain configured.';
                 $messageType = 'error';
                 break;
             }
@@ -151,20 +151,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $expectedIdentity = $config['fingerprint'];
                 
                 if ($result['valid']) {
-                    $message = 'DNS verificato con successo! Il tuo profilo CVerify è attivo.';
+                    $message = 'DNS verified with success! Your CVerify profile is active.';
                     $messageType = 'success';
                 } else {
                     // Messaggio più dettagliato
                     if ($currentDnsIdentity && $currentDnsIdentity !== $expectedIdentity) {
-                        $message = 'I record DNS non corrispondono! Nel DNS: "' . substr($currentDnsIdentity, 0, 20) . '..." - Richiesto: "' . substr($expectedIdentity, 0, 20) . '..." - Devi AGGIORNARE i record DNS con i nuovi valori.';
+                        $message = 'The DNS records do not correspond! In the DNS: "' . substr($currentDnsIdentity, 0, 20) . '..." - Requested: "' . substr($expectedIdentity, 0, 20) . '..." - You must UPDATE the DNS records with the new values.';
                     } else {
                         $errorDetails = implode(', ', $result['errors']);
-                        $message = 'Verifica DNS fallita: ' . $errorDetails;
+                        $message = 'DNS verification failed: ' . $errorDetails;
                     }
                     $messageType = 'error';
                 }
             } catch (Exception $e) {
-                $message = 'Errore nella verifica: ' . $e->getMessage();
+                $message = 'Error in verification: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
@@ -175,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // @unlink(PUBLIC_KEY_FILE);
             @unlink(CONFIG_FILE);
             $config = [];
-            $message = 'Configurazione resettata.';
+            $message = 'Configuration reset.';
             $messageType = 'info';
             break;
     }
@@ -334,26 +334,26 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
         <?php if (!$isConfigured): ?>
             <!-- Form Generazione Chiavi -->
             <div class="card">
-                <h2>🔑 Genera Chiavi RSA</h2>
+                <h2>🔑 Generate RSA Keys</h2>
                 <form method="POST">
                     <input type="hidden" name="action" value="generate">
                     
-                    <label for="domain">Il tuo dominio *</label>
-                    <input type="text" id="domain" name="domain" placeholder="tuodominio.com" required>
+                    <label for="domain">Your domain *</label>
+                    <input type="text" id="domain" name="domain" placeholder="yourdomain.com" required>
                     
-                    <label for="owner_name">Nome completo (opzionale)</label>
-                    <input type="text" id="owner_name" name="owner_name" placeholder="Mario Rossi">
+                    <label for="owner_name">Full name (optional)</label>
+                    <input type="text" id="owner_name" name="owner_name" placeholder="John Doe">
                     
-                    <label for="passphrase">Passphrase chiave privata (opzionale)</label>
-                    <input type="password" id="passphrase" name="passphrase" placeholder="Lascia vuoto per nessuna passphrase">
+                    <label for="passphrase">Private key passphrase (optional)</label>
+                    <input type="password" id="passphrase" name="passphrase" placeholder="Leave empty for no passphrase">
                     
-                    <button type="submit" class="btn-primary">🔐 Genera Chiavi</button>
+                    <button type="submit" class="btn-primary">🔐 Generate Keys</button>
                 </form>
             </div>
         <?php else: ?>
             <!-- Configurazione Esistente -->
             <div class="card">
-                <h2>✅ Configurazione Attiva</h2>
+                <h2>✅ Active Configuration</h2>
                 
                 <div class="info-box">
                     <label>Dominio</label>
@@ -396,14 +396,14 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
                 <h2>📡 Record DNS da Configurare</h2>
                 
                 <div class="warning-box">
-                    ⚠️ <strong>IMPORTANTE:</strong> I record vanno inseriti sul dominio principale 
-                    <strong><?= htmlspecialchars($config['domain'] ?? '') ?></strong> con Host/Name impostato su 
-                    <code>@</code> (oppure lasciato vuoto, a seconda del provider).
+                    ⚠️ <strong>IMPORTANT:</strong> The records must be inserted on the main domain 
+                    <strong><?= htmlspecialchars($config['domain'] ?? '') ?></strong> with Host/Name set to 
+                    <code>@</code> (or left blank, depending on the provider).
                 </div>
 
                 <h3 style="margin-top: 1.5rem;">1️⃣ Record Identificativo:</h3>
                 <div class="dns-record">
-                    <strong>Host/Name:</strong> <code>@</code> (oppure lascia vuoto)<br>
+                    <strong>Host/Name:</strong> <code>@</code> (or leave blank)<br>
                     <strong>Type:</strong> <code>TXT</code><br>
                     <strong>Value/Content:</strong><br>
                     <code><?= htmlspecialchars($dnsRecords['identity']) ?></code>
@@ -412,7 +412,7 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
                 <h3 style="margin-top: 1.5rem;">2️⃣ Record Chiave Pubblica:</h3>
                 <?php foreach ($dnsRecords['public_key'] as $index => $record): ?>
                     <div class="dns-record">
-                        <strong>Host/Name:</strong> <code>@</code> (oppure lascia vuoto)<br>
+                        <strong>Host/Name:</strong> <code>@</code> (or leave blank)<br>
                         <strong>Type:</strong> <code>TXT</code><br>
                         <strong>Value/Content (Parte <?= $index + 1 ?>):</strong><br>
                         <code><?= htmlspecialchars($record['value']) ?></code>
@@ -420,14 +420,14 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
                 <?php endforeach; ?>
 
                 <div class="dns-instructions">
-                    <h3>📖 Istruzioni per la configurazione:</h3>
+                    <h3>📖 Instructions for configuration:</h3>
                     <ol>
-                        <li>Accedi al pannello DNS del tuo registrar (es. Cloudflare, GoDaddy, Aruba, OVH)</li>
-                        <li>Per ogni record sopra, crea un nuovo record <strong>TXT</strong></li>
-                        <li>Nel campo <strong>Host</strong> o <strong>Name</strong>, inserisci <code>@</code> (o lascia vuoto per il dominio principale)</li>
-                        <li>Nel campo <strong>Value</strong> o <strong>Content</strong>, copia l'intero valore mostrato (inizia con <code>cverify-</code>)</li>
-                        <li>Salva e attendi la propagazione DNS (solitamente pochi minuti, max 48 ore)</li>
-                        <li>Usa il pulsante <strong>"Verifica DNS"</strong> per controllare la configurazione</li>
+                        <li>Access the DNS panel of your registrar (e.g. Cloudflare, GoDaddy, Aruba, OVH)</li>
+                        <li>For each record above, create a new record <strong>TXT</strong></li>
+                        <li>In the field <strong>Host</strong> or <strong>Name</strong>, insert <code>@</code> (or leave blank for the main domain)</li>
+                        <li>In the field <strong>Value</strong> or <strong>Content</strong>, copy the entire value shown (starts with <code>cverify-</code>)</li>
+                        <li>Save and wait for DNS propagation (usually a few minutes, max 48 hours)</li>
+                        <li>Use the button <strong>"Verify DNS"</strong> to check the configuration</li>
                     </ol>
                 </div>
             </div>
@@ -436,7 +436,7 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
         <?php if ($debugInfo): ?>
             <!-- Debug Info -->
             <div class="card">
-                <h2>🔍 Debug DNS</h2>
+                <h2>🔍 DNS Debug</h2>
                 
                 <?php 
                 // Estrai l'identità attuale dal DNS
@@ -466,10 +466,10 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
                     </div>
                     <?php if ($currentDnsId && !$idsMatch): ?>
                         <div style="background: rgba(239,68,68,0.3); padding: 0.75rem; border-radius: 6px; margin-top: 0.5rem; color: #f87171;">
-                            ❌ <strong>I record NON corrispondono!</strong> Devi aggiornare i record DNS:
+                            ❌ <strong>The records do NOT correspond!</strong> You must update the DNS records:
                             <ol style="margin: 0.5rem 0 0 1.5rem;">
-                                <li>Elimina i vecchi record TXT che iniziano con <code>cverify-</code></li>
-                                <li>Inserisci i nuovi record mostrati sopra</li>
+                                <li>Remove the old TXT records that start with <code>cverify-</code></li>
+                                <li>Insert the new records shown above</li>
                             </ol>
                         </div>
                     <?php elseif ($idsMatch): ?>
@@ -480,7 +480,7 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
                 </div>
                 
                 <div class="debug-box">
-                    <h4>Dominio interrogato:</h4>
+                    <h4>Domain interrogato:</h4>
                     <?= htmlspecialchars($debugInfo['domain']) ?>
                     
                     <h4 style="margin-top: 1rem;">Record TXT trovati (<?= count($debugInfo['parsed_records']) ?>):</h4>
@@ -498,10 +498,10 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
 
         <?php if (!empty($generatedPrivateKey)): ?>
             <div class="card" style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444;">
-                <h2>🔑 LA TUA CHIAVE PRIVATA - SALVALA ORA!</h2>
+                <h2>🔑 YOUR PRIVATE KEY - SAVE IT NOW!</h2>
                 <div class="warning-box" style="background: rgba(239, 68, 68, 0.2);">
-                    ⚠️ <strong>ATTENZIONE:</strong> Questa chiave verrà mostrata SOLO UNA VOLTA. 
-                    Copiala e salvala in un luogo sicuro. Ti servirà per accedere al tuo account.
+                    ⚠️ <strong>WARNING:</strong> This key will be shown ONLY ONCE. 
+                    Copy and save it in a safe place. You will need it to access your account.
                 </div>
                 <textarea readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px; background: #1a1a2e; color: #10b981; padding: 1rem; border-radius: 8px;"><?= htmlspecialchars($generatedPrivateKey) ?></textarea>
                 <button onclick="navigator.clipboard.writeText(this.previousElementSibling.value); alert('Chiave copiata!');" class="btn-primary" style="margin-top: 1rem;">

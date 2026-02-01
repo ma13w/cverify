@@ -28,8 +28,8 @@ include 'includes/header.php';
                     </h1>
                     
                     <p class="text-lg sm:text-xl text-navy-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-                        CVerify è un protocollo decentralizzato che permette alle aziende di attestare 
-                        le esperienze lavorative dei professionisti usando firme digitali verificabili via DNS.
+                        CVerify is a decentralized protocol allowing companies to attest 
+                        professional work experiences using DNS-verifiable digital signatures.
                     </p>
                     
                     <div class="flex flex-col sm:flex-row justify-center gap-4">
@@ -54,10 +54,10 @@ include 'includes/header.php';
         <section class="py-20 border-t border-navy-800/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl font-bold text-white mb-4">Come Funziona</h2>
+                    <h2 class="text-3xl font-bold text-white mb-4">How It Works</h2>
                     <p class="text-navy-400 max-w-2xl mx-auto">
-                        Un sistema trustless dove nessuna autorità centrale controlla i dati. 
-                        Tutto è verificabile matematicamente.
+                        A trustless system where no central authority controls the data. 
+                        Everything is mathematically verifiable.
                     </p>
                 </div>
                 
@@ -69,8 +69,8 @@ include 'includes/header.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">Genera Chiavi</h3>
-                        <p class="text-sm text-navy-400">L'utente genera una coppia di chiavi RSA e pubblica quella pubblica nel DNS del suo dominio.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2">Generate Keys</h3>
+                        <p class="text-sm text-navy-400">The user generates a pair of RSA keys and publishes the public key in their domain's DNS.</p>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-6 text-center relative">
@@ -80,8 +80,8 @@ include 'includes/header.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">Richiedi Validazione</h3>
-                        <p class="text-sm text-navy-400">L'utente invia una richiesta firmata all'azienda per cui ha lavorato.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2">Request Validation</h3>
+                        <p class="text-sm text-navy-400">The user sends a signed request to the company they worked for.</p>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-6 text-center relative">
@@ -91,8 +91,8 @@ include 'includes/header.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">Firma Aziendale</h3>
-                        <p class="text-sm text-navy-400">L'azienda verifica e firma crittograficamente l'attestazione.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2">Company Signature</h3>
+                        <p class="text-sm text-navy-400">The company verifies and cryptographically signs the attestation.</p>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-6 text-center relative">
@@ -102,8 +102,8 @@ include 'includes/header.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">Verifica Pubblica</h3>
-                        <p class="text-sm text-navy-400">Chiunque può verificare matematicamente l'autenticità delle credenziali.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2">Public Verification</h3>
+                        <p class="text-sm text-navy-400">Anyone can mathematically verify the authenticity of the credentials.</p>
                     </div>
                 </div>
             </div>
@@ -113,9 +113,9 @@ include 'includes/header.php';
         <section id="roles" class="py-20 border-t border-navy-800/50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl font-bold text-white mb-4">Scegli il Tuo Ruolo</h2>
+                    <h2 class="text-3xl font-bold text-white mb-4">Choose Your Role</h2>
                     <p class="text-navy-400 max-w-2xl mx-auto">
-                        Tre portali dedicati per gestire ogni aspetto del sistema di attestazione.
+                        Three dedicated portals to manage every aspect of the attestation system.
                     </p>
                 </div>
                 
@@ -129,14 +129,14 @@ include 'includes/header.php';
                         </div>
                         <h3 class="text-2xl font-bold text-white mb-3">User Dashboard</h3>
                         <p class="text-navy-400 mb-6">
-                            Gestisci la tua identità digitale, aggiungi esperienze lavorative e richiedi validazioni alle aziende.
+                            Manage your digital identity, add work experiences and request validations from companies.
                         </p>
                         <ul class="space-y-2 text-sm text-navy-300 mb-6">
                             <li class="flex items-center space-x-2">
                                 <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                 </svg>
-                                <span>Genera chiavi RSA</span>
+                                <span>Generate RSA keys</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
@@ -152,7 +152,7 @@ include 'includes/header.php';
                             </li>
                         </ul>
                         <span class="inline-flex items-center text-blue-400 font-medium group-hover:text-blue-300">
-                            Accedi
+                            Login
                             <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
@@ -168,7 +168,7 @@ include 'includes/header.php';
                         </div>
                         <h3 class="text-2xl font-bold text-white mb-3">Company Portal</h3>
                         <p class="text-navy-400 mb-6">
-                            Ricevi richieste di validazione dai professionisti e firma le attestazioni delle esperienze.
+                            Receive validation requests from professionals and sign the attestations.
                         </p>
                         <ul class="space-y-2 text-sm text-navy-300 mb-6">
                             <li class="flex items-center space-x-2">
@@ -191,7 +191,7 @@ include 'includes/header.php';
                             </li>
                         </ul>
                         <span class="inline-flex items-center text-purple-400 font-medium group-hover:text-purple-300">
-                            Accedi
+                            Login
                             <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
@@ -207,14 +207,14 @@ include 'includes/header.php';
                         </div>
                         <h3 class="text-2xl font-bold text-white mb-3">Verifier Lens</h3>
                         <p class="text-navy-400 mb-6">
-                            Verifica crittograficamente l'autenticità delle credenziali professionali di chiunque.
+                            Cryptographically verify the authenticity of anyone's professional credentials.
                         </p>
                         <ul class="space-y-2 text-sm text-navy-300 mb-6">
                             <li class="flex items-center space-x-2">
                                 <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
                                 </svg>
-                                <span>Verifica identità DNS</span>
+                                <span>DNS Identity Verification</span>
                             </li>
                             <li class="flex items-center space-x-2">
                                 <svg class="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
@@ -230,7 +230,7 @@ include 'includes/header.php';
                             </li>
                         </ul>
                         <span class="inline-flex items-center text-emerald-400 font-medium group-hover:text-emerald-300">
-                            Accedi
+                            Login
                             <svg class="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                             </svg>
@@ -245,25 +245,25 @@ include 'includes/header.php';
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="glass-card rounded-3xl p-8 md:p-12 text-center">
                     <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
-                        Perché CVerify è Trustworthy?
+                        Why is CVerify Trustworthy?
                     </h2>
                     <p class="text-navy-300 max-w-3xl mx-auto mb-10">
-                        A differenza dei sistemi centralizzati come LinkedIn, CVerify non richiede fiducia in terze parti. 
-                        Tutto è verificabile matematicamente usando standard crittografici aperti.
+                        Unlike centralized systems like LinkedIn, CVerify does not require trust in third parties. 
+                        Everything is mathematically verifiable using open cryptographic standards.
                     </p>
                     
                     <div class="grid md:grid-cols-3 gap-8">
                         <div class="text-center">
                             <div class="text-4xl font-bold text-emerald-400 mb-2">RSA-2048</div>
-                            <div class="text-sm text-navy-400">Crittografia Standard Industriale</div>
+                            <div class="text-sm text-navy-400">Industry Standard Cryptography</div>
                         </div>
                         <div class="text-center">
                             <div class="text-4xl font-bold text-emerald-400 mb-2">DNS TXT</div>
-                            <div class="text-sm text-navy-400">Infrastruttura Decentralizzata</div>
+                            <div class="text-sm text-navy-400">Decentralized Infrastructure</div>
                         </div>
                         <div class="text-center">
                             <div class="text-4xl font-bold text-emerald-400 mb-2">SHA-256</div>
-                            <div class="text-sm text-navy-400">Integrità Garantita</div>
+                            <div class="text-sm text-navy-400">Guaranteed Integrity</div>
                         </div>
                     </div>
                 </div>

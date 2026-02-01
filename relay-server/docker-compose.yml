@@ -1,9 +1,8 @@
-version: "3.8"
-
 services:
   relay-server:
     image: php:8.2-apache
     container_name: cverify-relay
+    user: root
     ports:
       - "7070:80"
     volumes:
@@ -13,11 +12,6 @@ services:
       - PHP_DISPLAY_ERRORS=Off
       - PHP_LOG_ERRORS=On
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   relay-data:

@@ -168,9 +168,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 $dns = new DNS($crypto);
                 
                 $userDomain = $session['domain'] ?? $config['domain'] ?? '';
-                $companyDomain = $exp['company_domain'];
+                if (empty($userDomain)) {
+                    throw new Exception('Domain not configured');
+                }
                 
-                // Prova a recuperare la chiave pubblica dell'azienda dal DNS
+                // Retrieve attestations from Relay Server
+                $url = RELAY_SERVER_URL . '/api/attestations.php?domain=' . urlencode($userDomain);
+                $ch = curl_init($url);
+                curl_setopt_array($ch, [
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => HTTP_TIMEOUT
+                ]);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                
+                if ($httpCode !== 200) {
+                    throw new Exception('Error retrieving attestations');
+                }
+                
+                $data = json_decode($response, true);
+                $attestations = $data['attestations'] ?? [];
+                
+                // Decripta attestazioni criptate e carica chiave privata
+                $privateKey = $_SESSION['private_key'] ?? null;
+                $passPhrase = $_SESSION['passphrase'] ?? null;
+                if (!$privateKey || !$passPhrase) {
+                    throw new Exception('Private key not available');
+                }
+                
+                $companyDomain = $session['domain'] ?? $config['domain'] ?? '';
                 $companyPublicKey = null;
                 try {
                     $companyPublicKey = $dns->getPublicKeyFromDNS($companyDomain);
@@ -241,10 +268,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
             case 'fetch_attestations':
                 $userDomain = $session['domain'] ?? $config['domain'] ?? '';
                 if (empty($userDomain)) {
-                    throw new Exception('Dominio non configurato');
+                    throw new Exception('Domain not configured');
                 }
                 
-                // Recupera attestazioni dal Relay Server
+                // Retrieve attestations from Relay Server
                 $url = RELAY_SERVER_URL . '/api/attestations.php?domain=' . urlencode($userDomain);
                 $ch = curl_init($url);
                 curl_setopt_array($ch, [
@@ -256,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 curl_close($ch);
                 
                 if ($httpCode !== 200) {
-                    throw new Exception('Errore recupero attestazioni');
+                    throw new Exception('Error retrieving attestations');
                 }
                 
                 $data = json_decode($response, true);
@@ -264,74 +291,95 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 
                 // Decripta attestazioni criptate e carica chiave privata
                 $privateKey = $_SESSION['private_key'] ?? null;
-                $crypto = new Crypto();
-                $processedAttestations = [];
-                
-                foreach ($attestations as $att) {
-                    // Rimuovi: if (isset($att['encrypted']) && $att['encrypted'] && isset($att['encrypted_payload'])) {
-                    //     // Attestazione criptata - decripta con chiave privata
-                    //     if ($privateKey) {
-                    //         try {
-                    //             $passPhrase = $_SESSION['passphrase'] ?? null;
-                    //             $decryptedData = $crypto->decryptWithPrivateKey($att['encrypted_payload'], $privateKey, $passPhrase);
-                    //             $processedAttestations[] = array_merge($att, $decryptedData);
-                    //         } catch (Exception $e) {
-                    //             $processedAttestations[] = array_merge($att, ['decrypt_error' => $e->getMessage()]);
-                    //         }
-                    //     } else {
-                    //         $processedAttestations[] = array_merge($att, ['decrypt_error' => 'Chiave privata mancante']);
-                    //     }
-                    // } else {
-                        // Attestazione in chiaro
-                        $processedAttestations[] = $att;
-                    // }
+                $passPhrase = $_SESSION['passphrase'] ?? null;
+                if (!$privateKey || !$passPhrase) {
+                    throw new Exception('Private key not available');
                 }
                 
-                // Aggiorna CV locale con le attestazioni ricevute
-                $updated = false;
-                $matchedCount = 0;
-                
-                foreach ($processedAttestations as $att) {
-                    // Salta attestazioni con errori di decrittazione
-                    if (isset($att['decrypt_error'])) {
-                        continue;
-                    }
-                    
-                    // Cerca l'experience_id nell'attestazione
-                    $expId = $att['experience_id'] ?? null;
-                    
-                    if (!$expId) {
-                        continue;
-                    }
-                    
-                    // Cerca l'esperienza corrispondente nel CV
-                    foreach ($cv['experiences'] as &$exp) {
-                        if ($exp['id'] === $expId && !$exp['validated']) {
-                            $exp['validated'] = true;
-                            $exp['attestation'] = $att;
-                            $updated = true;
-                            $matchedCount++;
-                            break;
-                        }
-                    }
-                    unset($exp);
+                $companyDomain = $session['domain'] ?? $config['domain'] ?? '';
+                $companyPublicKey = null;
+                try {
+                    $companyPublicKey = $dns->getPublicKeyFromDNS($companyDomain);
+                } catch (Exception $e) {
+                    // Azienda non ha chiave DNS, invieremo in chiaro
                 }
                 
-                if ($updated) {
-                    file_put_contents($cvFile, json_encode($cv, JSON_PRETTY_PRINT));
+                // Prepara i dati della richiesta
+                $requestData = [
+                    'user_domain' => $userDomain,
+                    'company_domain' => $companyDomain,
+                    'experience_id' => $exp['id'],
+                    'experience_data' => [
+                        'role' => $exp['role'],
+                        'description' => $exp['description'] ?? '',
+                        'start_date' => $exp['start_date'],
+                        'end_date' => $exp['end_date']
+                    ],
+                    'timestamp' => date('c')
+                ];
+
+                // Rimuovi: Se l'azienda ha una chiave pubblica, cripta i dati sensibili
+                // if ($companyPublicKey) {
+                //     $sensitiveData = [
+                //         'experience_id' => $exp['id'],
+                //         'experience_data' => $requestData['experience_data'],
+                //         'user_public_key' => $config['public_key'] ?? null,
+                //         'timestamp' => date('c')
+                //     ];
+                //     $encryptedPayload = $crypto->encryptForRecipient($sensitiveData, $companyPublicKey);
+                //     $requestData['encrypted_payload'] = $encryptedPayload;
+                //     $requestData['encrypted'] = true;
+                // } else {
+                //     // Invia in chiaro
+                // }
+
+                // Invia sempre in chiaro
+                $requestData['encrypted'] = false;
+
+                // Invia al Relay Server
+                $ch = curl_init(RELAY_SERVER_URL . '/api/request.php');
+                curl_setopt_array($ch, [
+                    CURLOPT_POST => true,
+                    CURLOPT_POSTFIELDS => json_encode($requestData),
+                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT => HTTP_TIMEOUT
+                ]);
+                $response = curl_exec($ch);
+                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                curl_close($ch);
+                
+                if ($httpCode !== 200) {
+                    $error = json_decode($response, true);
+                    throw new Exception($error['error'] ?? 'Errore invio al relay server');
                 }
+                
+                $relayResponse = json_decode($response, true);
                 
                 echo json_encode([
                     'success' => true,
-                    'count' => count($processedAttestations),
-                    'matched' => $matchedCount,
-                    'attestations' => $processedAttestations,
-                    'updated' => $updated
+                    'message' => 'Richiesta inviata al relay server',
+                    'encrypted' => $companyPublicKey !== null,
+                    'request_id' => $relayResponse['request_id'] ?? null
                 ]);
                 break;
                 
+            case 'reject':
+                $requestId = $_POST['request_id'] ?? '';
+                $reason = $_POST['reason'] ?? 'Request rejected';
+                
+                // Remove from pending
+                $cv['experiences'] = array_values(array_filter(
+                    $cv['experiences'],
+                    fn($e) => $e['id'] !== $requestId
+                ));
+                file_put_contents($cvFile, json_encode($cv, JSON_PRETTY_PRINT));
+                
+                echo json_encode(['success' => true]);
+                break;
+                
             default:
-                throw new Exception('Azione non valida');
+                throw new Exception('Invalid action');
         }
     } catch (Exception $e) {
         http_response_code(400);
@@ -355,7 +403,7 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                     <span>User Dashboard</span>
                 </h1>
-                <p class="text-navy-400 mt-2">Gestisci il tuo CV verificabile e le attestazioni</p>
+                <p class="text-navy-400 mt-2">Manage your verifiable CV and attestations</p>
             </div>
             
             <!-- Session Info & Logout -->
@@ -460,7 +508,7 @@ include __DIR__ . '/../includes/header.php';
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
                         </svg>
-                        <span>Scarica cv.json</span>
+                        <span>Download cv.json</span>
                     </a>
                 </div>
             </div>
@@ -483,22 +531,22 @@ include __DIR__ . '/../includes/header.php';
                                    class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-navy-500" required>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-navy-300 mb-2">Ruolo *</label>
+                            <label class="block text-sm font-medium text-navy-300 mb-2">Role *</label>
                             <input type="text" name="role" placeholder="Software Developer" 
                                    class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-navy-500" required>
                         </div>
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-navy-300 mb-2">Descrizione</label>
-                            <textarea name="description" rows="2" placeholder="Descrivi le tue responsabilità..." 
+                            <label class="block text-sm font-medium text-navy-300 mb-2">Description</label>
+                            <textarea name="description" rows="2" placeholder="Describe your responsibilities..." 
                                       class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-navy-500"></textarea>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-navy-300 mb-2">Data Inizio</label>
+                            <label class="block text-sm font-medium text-navy-300 mb-2">Start Date</label>
                             <input type="date" name="start_date" 
                                    class="input-field w-full px-4 py-3 rounded-xl text-white">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-navy-300 mb-2">Data Fine</label>
+                            <label class="block text-sm font-medium text-navy-300 mb-2">End Date</label>
                             <input type="date" name="end_date" 
                                    class="input-field w-full px-4 py-3 rounded-xl text-white">
                         </div>
@@ -637,9 +685,9 @@ include __DIR__ . '/../includes/header.php';
         }
         
         async function logout() {
-            if (!confirm('Vuoi effettuare il logout?')) return;
+            if (!confirm('Do you want to logout?')) return;
             
-            console.log('%c🚪 CVerify: Logout in corso...', 'color: #f59e0b;');
+            console.log('%c🚪 CVerify: Logging out...', 'color: #f59e0b;');
             
             const formData = new FormData();
             formData.append('action', 'logout');
@@ -696,6 +744,9 @@ include __DIR__ . '/../includes/header.php';
                     } else {
                         showToast('Nessuna nuova attestazione', 'info');
                     }
+                    // Update counter
+                    const countEl = document.getElementById('pendingCount');
+                    countEl.textContent = data.count;
                 } else {
                     throw new Error(data.error);
                 }

@@ -69,7 +69,7 @@ $stats = getStats();
                         <span class="text-emerald-400 font-mono font-bold">POST</span>
                         <code class="text-gray-300">/api/request</code>
                     </div>
-                    <p class="text-gray-400 text-sm">Invia una richiesta di validazione (utente → azienda)</p>
+                    <p class="text-gray-400 text-sm">Send a validation request (user → company)</p>
                 </div>
                 
                 <div class="bg-black/30 rounded-xl p-4">
@@ -77,7 +77,7 @@ $stats = getStats();
                         <span class="text-emerald-400 font-mono font-bold">POST</span>
                         <code class="text-gray-300">/api/attestation</code>
                     </div>
-                    <p class="text-gray-400 text-sm">Pubblica un'attestazione firmata (azienda → utente)</p>
+                    <p class="text-gray-400 text-sm">Publish a signed attestation (company → user)</p>
                 </div>
                 
                 <div class="bg-black/30 rounded-xl p-4">

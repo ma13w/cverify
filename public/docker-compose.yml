@@ -1,9 +1,8 @@
-version: "3.8"
-
 services:
   cverify-public:
     image: php:8.2-apache
     container_name: cverify-public
+    user: root
     ports:
       - "8080:80"
     volumes:
@@ -15,11 +14,6 @@ services:
       - PHP_LOG_ERRORS=On
       - RELAY_SERVER_URL=http://cverify.cv:7070
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
 volumes:
   user-data:

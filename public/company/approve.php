@@ -299,7 +299,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($jsonResponse) {
             header('Content-Type: application/json');
             http_response_code(400);
-            echo json_encode(['error' => 'ID validazione mancante']);
+            echo json_encode(['error' => 'Validation ID missing']);
             exit;
         }
         header('Location: dashboard.php?error=missing_id');
@@ -528,28 +528,28 @@ $approved = loadApprovedValidations();
                     
                     <?php if ($config['has_passphrase'] ?? false): ?>
                         <div class="form-group">
-                            <label>Passphrase Chiave Privata</label>
-                            <input type="password" name="passphrase" placeholder="Inserisci passphrase">
+                            <label>Private Key Passphrase</label>
+                            <input type="password" name="passphrase" placeholder="Enter passphrase">
                         </div>
                     <?php endif; ?>
                     
                     <div class="form-group">
                         <label>
                             <input type="checkbox" name="send_callback" value="true" checked>
-                            Invia automaticamente all'utente
+                            Automatically send to user
                         </label>
                     </div>
                     
-                    <button type="submit" class="btn-success">✅ Approva e Firma</button>
-                    <a href="dashboard.php" class="btn-secondary" style="display: inline-block; padding: 0.75rem 1.5rem; text-decoration: none;">Annulla</a>
+                    <button type="submit" class="btn-success">✅ Approve and Sign</button>
+                    <a href="dashboard.php" class="btn-secondary" style="display: inline-block; padding: 0.75rem 1.5rem; text-decoration: none;">Cancel</a>
                 </form>
             </div>
         <?php else: ?>
             <div class="card">
-                <h2>📜 Attestazioni Emesse</h2>
+                <h2>📜 Issued Attestations</h2>
                 
                 <?php if (empty($approved)): ?>
-                    <p style="color: #666;">Nessuna attestazione emessa.</p>
+                    <p style="color: #666;">No attestations issued.</p>
                 <?php else: ?>
                     <?php foreach ($approved as $att): ?>
                         <div class="attestation-item">

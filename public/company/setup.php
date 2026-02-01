@@ -51,13 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $passphrase = $_POST['passphrase'] ?? '';
 
             if (empty($domain)) {
-                $message = 'Il dominio aziendale è obbligatorio.';
+                $message = 'Company domain is required.';
                 $messageType = 'error';
                 break;
             }
 
             if (empty($companyName)) {
-                $message = 'La ragione sociale è obbligatoria.';
+                $message = 'Company name is required.';
                 $messageType = 'error';
                 break;
             }
@@ -118,14 +118,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $messageType = 'success';
                 
             } catch (Exception $e) {
-                $message = 'Errore nella generazione delle chiavi: ' . $e->getMessage();
+                $message = 'Error generating keys: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
 
         case 'show_dns':
             if (!file_exists(PUBLIC_KEY_FILE) || !file_exists(CONFIG_FILE)) {
-                $message = 'Genera prima le chiavi.';
+                $message = 'Generate keys first.';
                 $messageType = 'error';
                 break;
             }
@@ -139,14 +139,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'public_key' => $dns->generateDnsRecordsForKey($publicKey),
                 ];
             } catch (Exception $e) {
-                $message = 'Errore: ' . $e->getMessage();
+                $message = 'Error: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
 
         case 'verify_dns':
             if (empty($config['domain'])) {
-                $message = 'Nessun dominio configurato.';
+                $message = 'No domain configured.';
                 $messageType = 'error';
                 break;
             }
@@ -173,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $messageType = 'error';
                 }
             } catch (Exception $e) {
-                $message = 'Errore nella verifica: ' . $e->getMessage();
+                $message = 'Error in verification: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
@@ -417,12 +417,12 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
 
         <?php if (!empty($generatedPrivateKey)): ?>
             <div class="card" style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444;">
-                <h2>🔑 CHIAVE PRIVATA AZIENDALE - SALVALA ORA!</h2>
+                <h2>🔑 COMPANY PRIVATE KEY - SAVE IT NOW!</h2>
                 <div class="warning-box" style="background: rgba(239, 68, 68, 0.2);">
-                    ⚠️ <strong>ATTENZIONE:</strong> Questa chiave verrà mostrata SOLO UNA VOLTA. 
-                    Copiala e salvala in un luogo sicuro. Ti servirà per accedere all'account aziendale.
+                    ⚠️ <strong>WARNING:</strong> This key will be shown ONLY ONCE. 
+                    Copy and save it in a safe place. You will need it to access your company account.
                     <br><br>
-                    <strong>🔒 Consiglio:</strong> Conserva questa chiave in un password manager aziendale o in un luogo sicuro accessibile solo al personale autorizzato.
+                    <strong>🔒 Tip:</strong> Store this key in a company password manager or a secure location accessible only to authorized personnel.
                 </div>
                 <textarea readonly style="width: 100%; height: 200px; font-family: monospace; font-size: 12px; background: #1a1a2e; color: #10b981; padding: 1rem; border-radius: 8px;"><?= htmlspecialchars($generatedPrivateKey) ?></textarea>
                 <button onclick="navigator.clipboard.writeText(this.previousElementSibling.value); alert('Chiave copiata!');" class="btn-primary" style="margin-top: 1rem;">
@@ -447,7 +447,7 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
 
                 <h3 style="margin-top: 1.5rem;">1️⃣ Record Identificativo:</h3>
                 <div class="dns-record">
-                    <strong>Host/Name:</strong> <code>@</code> (oppure lascia vuoto)<br>
+                    <strong>Host/Name:</strong> <code>@</code> (or leave empty)<br>
                     <strong>Type:</strong> <code>TXT</code><br>
                     <strong>Value/Content:</strong><br>
                     <code><?= htmlspecialchars($dnsRecords['identity']) ?></code>
@@ -456,22 +456,22 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
                 <h3 style="margin-top: 1.5rem;">2️⃣ Record Chiave Pubblica:</h3>
                 <?php foreach ($dnsRecords['public_key'] as $index => $record): ?>
                     <div class="dns-record">
-                        <strong>Host/Name:</strong> <code>@</code> (oppure lascia vuoto)<br>
+                        <strong>Host/Name:</strong> <code>@</code> (or leave empty)<br>
                         <strong>Type:</strong> <code>TXT</code><br>
-                        <strong>Value/Content (Parte <?= $index + 1 ?>):</strong><br>
+                        <strong>Value/Content (Part <?= $index + 1 ?>):</strong><br>
                         <code><?= htmlspecialchars($record['value']) ?></code>
                     </div>
                 <?php endforeach; ?>
 
                 <div class="dns-instructions">
-                    <h3>📖 Istruzioni per la configurazione:</h3>
+                    <h3>📖 Configuration Instructions:</h3>
                     <ol>
-                        <li>Accedi al pannello DNS del tuo registrar (es. Cloudflare, GoDaddy, Aruba, OVH)</li>
-                        <li>Per ogni record sopra, crea un nuovo record <strong>TXT</strong></li>
-                        <li>Nel campo <strong>Host</strong> o <strong>Name</strong>, inserisci <code>@</code> (o lascia vuoto per il dominio principale)</li>
-                        <li>Nel campo <strong>Value</strong> o <strong>Content</strong>, copia l'intero valore mostrato (inizia con <code>cverify-</code>)</li>
-                        <li>Salva e attendi la propagazione DNS (solitamente pochi minuti, max 48 ore)</li>
-                        <li>Usa il pulsante <strong>"Verifica DNS"</strong> per controllare la configurazione</li>
+                        <li>Access your registrar's DNS panel (e.g., Cloudflare, GoDaddy, Namecheap, OVH)</li>
+                        <li>For each record above, create a new record <strong>TXT</strong></li>
+                        <li>In the field <strong>Host</strong> or <strong>Name</strong>, enter <code>@</code> (or leave empty for main domain)</li>
+                        <li>In the field <strong>Value</strong> or <strong>Content</strong>, copy the entire value shown (starts with <code>cverify-</code>)</li>
+                        <li>Save and wait for DNS propagation (usually a few minutes, max 48 hours)</li>
+                        <li>Use the button <strong>"Verify DNS"</strong> to check the configuration</li>
                     </ol>
                 </div>
             </div>

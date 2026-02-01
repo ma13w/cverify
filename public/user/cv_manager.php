@@ -119,7 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $description = trim($_POST['description'] ?? '');
             
             if (empty($role) || empty($companyDomain)) {
-                $message = 'Ruolo e dominio azienda sono obbligatori.';
+                $message = 'Role and company domain are required.';
                 $messageType = 'error';
                 break;
             }
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $cv['experiences'][] = $experience;
             saveCV($cv);
             
-            $message = 'Esperienza aggiunta con successo!';
+            $message = 'Experience added with success!';
             $messageType = 'success';
             break;
 
@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ));
             saveCV($cv);
             
-            $message = 'Esperienza eliminata.';
+            $message = 'Experience deleted.';
             $messageType = 'info';
             break;
 
@@ -176,7 +176,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if ($expIndex === null) {
-                $message = 'Esperienza non trovata.';
+                $message = 'Experience not found.';
                 $messageType = 'error';
                 break;
             }
@@ -188,7 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $privateKey = $_SESSION['private_key'] ?? null;
 
                 if (!$privateKey) {
-                    throw new Exception('Chiave privata utente non configurata');
+                    throw new Exception('User private key not configured');
                 }
                 
                 // Invia richiesta di validazione
@@ -207,14 +207,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $cv['experiences'][$expIndex]['validation_requested_at'] = date('c');
                     saveCV($cv);
                     
-                    $message = 'Richiesta di validazione inviata con successo a ' . $experience['company_domain'];
+                    $message = 'Validation request sent with success to ' . $experience['company_domain'];
                     $messageType = 'success';
                 } else {
-                    $message = 'Errore nell\'invio della richiesta: ' . $result['error'];
+                    $message = 'Error in sending the request: ' . $result['error'];
                     $messageType = 'error';
                 }
             } catch (Exception $e) {
-                $message = 'Errore: ' . $e->getMessage();
+                $message = 'Error: ' . $e->getMessage();
                 $messageType = 'error';
             }
             break;
@@ -225,15 +225,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($pdfPath) && file_exists($pdfPath)) {
                 $cv['pdf_hash'] = hash_file('sha256', $pdfPath);
                 saveCV($cv);
-                $message = 'Hash PDF aggiornato.';
+                $message = 'PDF Hash updated.';
                 $messageType = 'success';
             } elseif (isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] === UPLOAD_ERR_OK) {
                 $cv['pdf_hash'] = hash_file('sha256', $_FILES['pdf_file']['tmp_name']);
                 saveCV($cv);
-                $message = 'Hash PDF aggiornato.';
+                $message = 'PDF Hash updated.';
                 $messageType = 'success';
             } else {
-                $message = 'Nessun file PDF valido fornito.';
+                $message = 'No valid PDF file provided.';
                 $messageType = 'error';
             }
             break;
@@ -241,7 +241,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'refresh_status':
             // Ricarica il CV per vedere eventuali aggiornamenti
             $cv = loadCV();
-            $message = 'Stato aggiornato.';
+            $message = 'Status updated.';
             $messageType = 'info';
             break;
 
@@ -259,7 +259,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             
             if (empty($attestationJson)) {
-                $message = 'Nessuna attestazione fornita.';
+                $message = 'No attestation provided.';
                 $messageType = 'error';
                 break;
             }
@@ -267,14 +267,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $attestationData = json_decode($attestationJson, true);
             
             if ($attestationData === null) {
-                $message = 'JSON attestazione non valido.';
+                $message = 'JSON attestation not valid.';
                 $messageType = 'error';
                 break;
             }
             
             // Valida struttura attestazione
             if (!isset($attestationData['attestation']) || !isset($attestationData['signature'])) {
-                $message = 'Struttura attestazione non valida. Richiesti: attestation, signature.';
+                $message = 'Structure attestazione non valida. Richiesti: attestation, signature.';
                 $messageType = 'error';
                 break;
             }
@@ -288,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $subjectFingerprint = $attestation['subject']['fingerprint'] ?? null;
             
             if ($subjectDomain !== $config['domain']) {
-                $message = 'Questa attestazione non è per il tuo dominio.';
+                $message = 'This attestation is not for your domain.';
                 $messageType = 'error';
                 break;
             }
@@ -369,11 +369,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if ($updatedCount > 0) {
                 saveCV($cv);
-                $verifiedNote = $issuerVerified ? ' (issuer verificato via DNS)' : ' (firma valida, DNS non verificato)';
+                $verifiedNote = $issuerVerified ? ' (issuer verified via DNS)' : ' (firma valida, DNS not verified)';
                 $message = "Importate $updatedCount esperienze validate" . $verifiedNote;
                 $messageType = 'success';
             } else {
-                $message = 'Nessuna esperienza corrispondente trovata nel CV.';
+                $message = 'No corresponding experience found in the CV.';
                 $messageType = 'info';
             }
             break;
@@ -386,13 +386,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Funzione per badge status
 function getStatusBadge(string $status): string {
     $badges = [
-        'pending' => ['⏳', 'In attesa', '#ffc107'],
-        'validation_requested' => ['📨', 'Richiesta inviata', '#17a2b8'],
-        'validated' => ['✅', 'Validato', '#28a745'],
-        'rejected' => ['❌', 'Rifiutato', '#dc3545'],
+        'pending' => ['⏳', 'Pending', '#ffc107'],
+        'validation_requested' => ['📨', 'Request sent', '#17a2b8'],
+        'validated' => ['✅', 'Validated', '#28a745'],
+        'rejected' => ['❌', 'Rejected', '#dc3545'],
     ];
     
-    $badge = $badges[$status] ?? ['❓', 'Sconosciuto', '#6c757d'];
+    $badge = $badges[$status] ?? ['❓', 'Unknown', '#6c757d'];
     
     return sprintf(
         '<span class="status-badge" style="background: %s20; color: %s; border: 1px solid %s;">%s %s</span>',
@@ -671,18 +671,18 @@ function getStatusBadge(string $status): string {
 
         <!-- Informazioni CV -->
         <div class="card">
-            <h2>📊 Riepilogo CV</h2>
+            <h2>📊 CV Summary</h2>
             <div class="info-grid">
                 <div class="info-item">
-                    <label>Esperienze</label>
+                    <label>Experiences</label>
                     <span><?= count($cv['experiences']) ?></span>
                 </div>
                 <div class="info-item">
-                    <label>Validate</label>
+                    <label>Validated</label>
                     <span><?= count(array_filter($cv['experiences'], fn($e) => $e['status'] === 'validated')) ?></span>
                 </div>
                 <div class="info-item">
-                    <label>In Attesa</label>
+                    <label>Pending</label>
                     <span><?= count(array_filter($cv['experiences'], fn($e) => in_array($e['status'], ['pending', 'validation_requested']))) ?></span>
                 </div>
                 <div class="info-item">
@@ -818,24 +818,24 @@ function getStatusBadge(string $status): string {
         <div class="card">
             <h2>📥 Importa Attestazione</h2>
             <p style="color: #a0a0a0; margin-bottom: 1rem;">
-                Se hai ricevuto un'attestazione firmata da un'azienda (file JSON), puoi importarla qui 
-                per aggiornare automaticamente lo stato delle tue esperienze a "Validato".
+                If you received a signed attestation from a company (JSON file), you can import it here 
+                to automatically update your experience status to 'Validated'.
             </p>
             <button type="button" class="btn-primary" onclick="openImportModal()">
-                📥 Importa Attestazione
+                📥 Import Attestation
             </button>
         </div>
 
         <div class="nav-links">
-            <a href="setup.php">🔐 Setup Chiavi</a>
-            <a href="cv.json" target="_blank">📄 Visualizza cv.json</a>
+            <a href="setup.php">🔐 Key Setup</a>
+            <a href="cv.json" target="_blank">📄 View cv.json</a>
         </div>
     </div>
 
     <!-- Modal per validazione -->
     <div id="validationModal" class="modal">
         <div class="modal-content">
-            <h3>📨 Richiedi Validazione</h3>
+            <h3>📨 Request Validation</h3>
             <p style="margin-bottom: 1rem; color: #a0a0a0;">
                 Stai per inviare una richiesta di validazione a <strong id="modalCompanyDomain"></strong>
             </p>
@@ -861,23 +861,23 @@ function getStatusBadge(string $status): string {
     <!-- Modal per importazione attestazione -->
     <div id="importModal" class="modal">
         <div class="modal-content" style="max-width: 600px;">
-            <h3>📥 Importa Attestazione</h3>
+            <h3>📥 Import Attestation</h3>
             <p style="margin-bottom: 1rem; color: #a0a0a0;">
-                Importa un'attestazione firmata ricevuta da un'azienda per validare le tue esperienze.
+                Import a signed attestation received from a company to validate your experiences.
             </p>
             <form method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="import_attestation">
                 
                 <div class="form-group">
-                    <label>Carica file JSON attestazione</label>
+                    <label>Upload attestation JSON file</label>
                     <input type="file" name="attestation_file" accept=".json,application/json" 
                            style="background: transparent; border: none; color: #fff;">
                 </div>
                 
-                <p style="text-align: center; color: #666; margin: 1rem 0;">— oppure —</p>
+                <p style="text-align: center; color: #666; margin: 1rem 0;">— or —</p>
                 
                 <div class="form-group">
-                    <label>Incolla JSON attestazione</label>
+                    <label>Paste attestation JSON</label>
                     <textarea name="attestation_json" rows="8" 
                               placeholder='{"attestation": {...}, "signature": "...", "issuer_public_key": "..."}'></textarea>
                 </div>
