@@ -5,8 +5,8 @@ version: "3.8"
 services:
   relay-server:
     build:
-      context: ./relay-server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./relay-server/Dockerfile
     container_name: cverify-relay
     restart: unless-stopped
     ports:
@@ -34,8 +34,8 @@ services:
 
   public:
     build:
-      context: ./public
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./public/Dockerfile
     container_name: cverify-public
     restart: unless-stopped
     ports:

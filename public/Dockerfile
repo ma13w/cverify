@@ -10,8 +10,11 @@ RUN docker-php-ext-install opcache
 # Enable Apache modules
 RUN a2enmod rewrite headers ssl
 
-# Copy application files
-COPY . /var/www/html/
+# Copy public application files
+COPY ./public /var/www/html/
+
+# Copy shared src directory
+COPY ./src /var/www/html/src/
 
 # Create data directories with proper permissions
 RUN mkdir -p /var/www/html/user/data \

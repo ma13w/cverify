@@ -11,7 +11,10 @@ RUN docker-php-ext-install opcache
 RUN a2enmod rewrite headers ssl
 
 # Copy application files
-COPY . /var/www/html/
+COPY ./relay-server /var/www/html/
+
+# Copy shared src directory
+COPY ./src /var/www/html/../src/
 
 # Create data directories with proper permissions
 RUN mkdir -p /var/www/html/data/pending \
@@ -19,9 +22,6 @@ RUN mkdir -p /var/www/html/data/pending \
              /var/www/html/data/rate_limits && \
     chown -R www-data:www-data /var/www/html/data && \
     chmod -R 755 /var/www/html/data
-
-# Copy Security class from parent directory
-COPY ../src/Security.php /var/www/html/../src/Security.php
 
 # Apache configuration for production
 RUN echo 'ServerTokens Prod\n\
