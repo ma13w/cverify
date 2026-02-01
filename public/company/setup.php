@@ -9,9 +9,14 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../src/Crypto.php';
 require_once __DIR__ . '/../src/DNS.php';
+require_once __DIR__ . '/../src/Security.php';
 
 use CVerify\Crypto;
 use CVerify\DNS;
+use CVerify\Security;
+
+// Start secure session
+Security::startSecureSession();
 
 // Configurazione
 define('COMPANY_DATA_DIR', __DIR__ . '/data');
@@ -53,13 +58,13 @@ if (!empty($config['domain']) && $config['domain'] !== $currentDomain) {
     die('Errore: Questa installazione è configurata per il dominio "' . htmlspecialchars($config['domain']) . '" ma stai accedendo da "' . htmlspecialchars($currentDomain) . '".');
 }
 
-// Gestione form - usa sempre dominio corrente
+// Gestione form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
         case 'generate':
-            $domain = $currentDomain; // Ignora input, usa dominio host
+            $domain = $currentDomain;
             $companyName = trim($_POST['company_name'] ?? '');
             $vatNumber = trim($_POST['vat_number'] ?? '');
             $passphrase = $_POST['passphrase'] ?? '';
@@ -70,23 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
 
-            // Normalizza dominio
-            $domain = preg_replace('#^https?://#', '', $domain);
-            $domain = preg_replace('#^www\.#', '', $domain);
-            $domain = rtrim($domain, '/');
-
             try {
                 // Genera coppia di chiavi
                 $keyPair = $crypto->generateKeyPair($passphrase ?: null);
-                session_set_cookie_params([
-                    'lifetime' => 3600,
-                    'path' => '/',
-                    'domain' => $_SERVER['HTTP_HOST'],
-                    'secure' => true,      // HTTPS only
-                    'httponly' => true,    // No JavaScript access
-                    'samesite' => 'Strict' // CSRF protection
-                ]);
-                session_start();
+                
+                // Session already started by Security::startSecureSession()
                 $_SESSION['private_key'] = $keyPair['privateKey'];
                 $_SESSION['passphrase'] = $passphrase;
                 

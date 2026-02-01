@@ -4,15 +4,6 @@
  * Autenticazione basata su chiave privata RSA.
  */
 declare(strict_types=1);
-session_set_cookie_params([
-    'lifetime' => 3600,
-    'path' => '/',
-    'domain' => $_SERVER['HTTP_HOST'],
-    'secure' => true,      // HTTPS only
-    'httponly' => true,    // No JavaScript access
-    'samesite' => 'Strict' // CSRF protection
-]);
-session_start();
 
 require_once __DIR__ . '/../src/Crypto.php';
 require_once __DIR__ . '/../src/DNS.php';
@@ -22,6 +13,9 @@ require_once __DIR__ . '/../src/Security.php';
 use CVerify\Crypto;
 use CVerify\Auth;
 use CVerify\Security;
+
+// Start secure session
+Security::startSecureSession();
 
 $pageTitle = 'User Login';
 

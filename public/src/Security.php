@@ -30,8 +30,7 @@ class Security
     }
     
     /**
-     * Start a secure session with proper cookie parameters.
-     * Automatically detects development mode (localhost/HTTP) and adjusts security accordingly.
+     * Start a secure session with proper cookie settings
      */
     public static function startSecureSession(): void
     {
@@ -39,22 +38,22 @@ class Security
             return;
         }
         
-        // Detect if we're in development mode (localhost or HTTP)
-        $isLocalhost = in_array($_SERVER['HTTP_HOST'] ?? '', ['localhost', '127.0.0.1', '::1']) 
-                       || strpos($_SERVER['HTTP_HOST'] ?? '', 'localhost:') === 0;
-        $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
-                   || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
+        $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') 
+                    || ($_SERVER['SERVER_PORT'] ?? 80) == 443;
         
-        // In production, require HTTPS. In development (localhost), allow HTTP
-        $secureCookie = $isHttps || (!$isLocalhost && !$isHttps);
+        // In development (localhost), allow non-secure cookies
+        $host = $_SERVER['HTTP_HOST'] ?? '';
+        $isLocalhost = in_array($host, ['localhost', '127.0.0.1']) 
+                       || str_starts_with($host, 'localhost:')
+                       || str_starts_with($host, '127.0.0.1:');
         
         session_set_cookie_params([
             'lifetime' => 3600,
             'path' => '/',
-            'domain' => $isLocalhost ? '' : ($_SERVER['HTTP_HOST'] ?? ''), // Empty domain for localhost
-            'secure' => $secureCookie,     // HTTPS only in production
-            'httponly' => true,            // No JavaScript access
-            'samesite' => 'Strict'         // CSRF protection
+            'domain' => '',
+            'secure' => $isSecure && !$isLocalhost,
+            'httponly' => true,
+            'samesite' => 'Strict'
         ]);
         
         session_start();

@@ -9,9 +9,14 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../src/Crypto.php';
 require_once __DIR__ . '/../src/DNS.php';
+require_once __DIR__ . '/../src/Security.php';
 
 use CVerify\Crypto;
 use CVerify\DNS;
+use CVerify\Security;
+
+// Start secure session
+Security::startSecureSession();
 
 // Configurazione
 define('USER_DATA_DIR', __DIR__ . '/data');
@@ -78,15 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Genera coppia di chiavi
                 $keyPair = $crypto->generateKeyPair($passphrase ?: null);
 
-                session_set_cookie_params([
-                    'lifetime' => 3600,
-                    'path' => '/',
-                    'domain' => $_SERVER['HTTP_HOST'],
-                    'secure' => true,      // HTTPS only
-                    'httponly' => true,    // No JavaScript access
-                    'samesite' => 'Strict' // CSRF protection
-                ]);
-                session_start();
+                // Session already started by Security::startSecureSession()
                 $_SESSION['private_key'] = $keyPair['privateKey'];
                 $_SESSION['passphrase'] = $passphrase;
                 
