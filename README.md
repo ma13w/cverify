@@ -105,7 +105,32 @@ The system is composed of three portals:
 
 ---
 
-## 🛠️ Installation (Hackathon Judges)
+## 🎮 Live Demo
+
+The protocol is live for testing! You can try the full flow right now:
+
+### 1. User Dashboard (The Applicant)
+
+- **URL:** [http://calimatteo.cv:5000](http://calimatteo.cv:5000)
+- **Use these credentials to login:**
+  - **Private Key:** [Download here](https://github.com/ma13w/cverify/blob/main/test/private_key.pem)
+  - **Passphrase:** `supp`
+
+### 2. Company Portal (The Issuer)
+
+- **URL:** [http://wb.info.wf:5000](http://wb.info.wf:5000)
+- **Use these credentials to login:**
+  - **Private Key:** [Download here](https://github.com/ma13w/cverify/blob/main/test/company_private_key.pem)
+  - **Passphrase:** `ppus`
+
+### 3. Verifier Lens (The HR / Recruiter)
+
+- **URL:** [http://cverify.cv:8080](http://cverify.cv:8080)
+- **Action:** Paste the profile URL to verify signatures.
+
+---
+
+## 🛠️ Installation
 
 To run the full suite locally:
 
@@ -117,7 +142,8 @@ git clone https://github.com/ma13w/cverify.git
 cd /public
 php -S localhost:8000
 
-# 3. Visit http://localhost:8000
+# 3. Visit the website
+http://localhost:8000 in your browser
 ```
 
 ## 🏆 Why CVerify Is Different
