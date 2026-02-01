@@ -10,6 +10,10 @@ RUN docker-php-ext-install opcache
 # Enable Apache modules (no SSL - handled by reverse proxy)
 RUN a2enmod rewrite headers
 
+# Disable SSL port (only use HTTP internally)
+RUN sed -i 's/Listen 443/#Listen 443/' /etc/apache2/ports.conf && \
+    a2dissite default-ssl 2>/dev/null || true
+
 # Copy application files
 COPY relay-server /var/www/html/
 
