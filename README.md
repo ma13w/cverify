@@ -4,10 +4,10 @@
 
 **The Decentralized Protocol for Professional Credential Verification.**
 
-[![Hackathon](https://img.shields.io/badge/Hackathon-Project-orange?style=flat-square)](https://github.com/yourusername/cverify)
+[![Hackathon](https://img.shields.io/badge/Hackathon-Project-orange?style=flat-square)](https://github.com/ma13w/cverify)
 [![PHP](https://img.shields.io/badge/PHP-8.2-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
 [![Crypto](https://img.shields.io/badge/Security-RSA__2048-green?style=flat-square)](https://openssl.org/)
-[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](LICENSE)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)](https://github.com/ma13w/cverify/blob/main/LICENSE)
 
 ---
 
@@ -111,24 +111,16 @@ To run the full suite locally:
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/yourusername/cverify.git
+git clone https://github.com/ma13w/cverify.git
 
-# 2. Setup permissions (Important for key storage)
-chmod 700 public/user/data
-chmod 700 public/company/data
-chmod 700 relay-server/data
+# 2. Start the internal server
+cd /public
+php -S localhost:8000
 
-# 3. Start the internal server
-php -S localhost:8000 -t public/
-
-# 4. Visit http://localhost:8000
+# 3. Visit http://localhost:8000
 ```
 
-_Note: For the DNS verification to work locally without real domains, the system includes a `DNS` class that can mock records for localhost testing._
-
----
-
-## 🏆 Why CVerify Wins
+## 🏆 Why CVerify Is Different
 
 - **Solves a Real Problem:** Resume fraud costs billions.
 - **Technically Sound:** Uses standard crypto primitives (OpenSSL) correctly.
