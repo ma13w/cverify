@@ -2,7 +2,7 @@
     "authenticated": true,
     "domain": "calimatteo.info.wf",
     "authenticated_at": "2026-02-01T11:39:47+01:00",
-    "expires_at": "2026-02-01T13:19:27+01:00",
+    "expires_at": "2026-02-01T13:39:26+01:00",
     "fingerprint": "83eb57708a7e4d3622c31f19c8bdbc0e25ae06363586cc2ab522e128c1cdf703",
-    "last_dns_check": "2026-02-01T12:19:26+01:00"
+    "last_dns_check": "2026-02-01T12:39:26+01:00"
 }

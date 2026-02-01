@@ -10,7 +10,7 @@ services:
     container_name: cverify-relay
     restart: unless-stopped
     ports:
-      - "${RELAY_PORT:-7070}:80"
+      - "${RELAY_PORT:-7070}:8080"
     volumes:
       # Persist relay data
       - relay_data:/var/www/html/data
@@ -23,7 +23,7 @@ services:
     networks:
       - cverify-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
       interval: 30s
       timeout: 3s
       retries: 3
@@ -31,40 +31,6 @@ services:
     labels:
       - "com.cverify.service=relay"
       - "com.cverify.description=Central relay server"
-
-  public:
-    build:
-      context: .
-      dockerfile: ./public/Dockerfile
-    container_name: cverify-public
-    restart: unless-stopped
-    ports:
-      - "${PUBLIC_PORT:-8080}:80"
-    volumes:
-      # Persist user/company data
-      - user_data:/var/www/html/user/data
-      - company_data:/var/www/html/company/data
-      # Optional: Mount custom config
-      - ./public/config.php:/var/www/html/config.php:ro
-    environment:
-      - PHP_OPCACHE_ENABLE=1
-      - APACHE_RUN_USER=www-data
-      - APACHE_RUN_GROUP=www-data
-      - RELAY_SERVER_URL=${RELAY_SERVER_URL:-http://relay-server}
-    networks:
-      - cverify-network
-    depends_on:
-      relay-server:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost/"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
-    labels:
-      - "com.cverify.service=public"
-      - "com.cverify.description=User/Company/Verifier portals"
 
 networks:
   cverify-network:

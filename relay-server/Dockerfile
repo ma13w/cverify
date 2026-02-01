@@ -1,65 +1,34 @@
-# CVerify Relay Server - Docker Image
-FROM php:8.2-apache
+# CVerify Relay Server - Simplified Docker Image
+FROM php:8.2-cli
 
 LABEL maintainer="CVerify Team"
-LABEL description="CVerify Relay Server - Central relay for validation requests and attestations"
+LABEL description="CVerify Relay Server"
 
-# Install PHP extensions
+# Install curl for healthcheck and required extensions
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 RUN docker-php-ext-install opcache
-
-# Enable Apache modules (no SSL - handled by reverse proxy)
-RUN a2enmod rewrite headers
-
-# Disable SSL port (only use HTTP internally)
-RUN sed -i 's/Listen 443/#Listen 443/' /etc/apache2/ports.conf && \
-    a2dissite default-ssl 2>/dev/null || true
 
 # Copy application files
 COPY relay-server /var/www/html/
 
-# Copy shared src directory from public
+# Copy shared src directory
 COPY public/src /var/www/html/../src/
 
-# Create data directories with proper permissions
+# Create data directories
 RUN mkdir -p /var/www/html/data/pending \
              /var/www/html/data/attestations \
              /var/www/html/data/rate_limits && \
-    chown -R www-data:www-data /var/www/html/data && \
-    chmod -R 755 /var/www/html/data
-
-# Apache configuration for production
-RUN echo 'ServerTokens Prod\n\
-ServerSignature Off\n\
-TraceEnable Off\n\
-Header always unset "X-Powered-By"\n\
-Header always set X-Content-Type-Options "nosniff"\n\
-Header always set X-Frame-Options "DENY"\n\
-Header always set X-XSS-Protection "1; mode=block"' >> /etc/apache2/conf-available/security.conf
+    chmod -R 777 /var/www/html/data
 
 # PHP production settings
-RUN { \
-    echo 'opcache.enable=1'; \
-    echo 'opcache.memory_consumption=128'; \
-    echo 'opcache.interned_strings_buffer=8'; \
-    echo 'opcache.max_accelerated_files=4000'; \
-    echo 'opcache.revalidate_freq=60'; \
-    echo 'opcache.fast_shutdown=1'; \
-    echo 'display_errors=Off'; \
-    echo 'log_errors=On'; \
-    echo 'error_log=/var/log/apache2/php_errors.log'; \
-    echo 'expose_php=Off'; \
-    echo 'session.cookie_httponly=1'; \
-    echo 'session.cookie_secure=1'; \
-    echo 'session.cookie_samesite=Strict'; \
-} > /usr/local/etc/php/conf.d/production.ini
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost/ || exit 1
-
-EXPOSE 80
+RUN echo 'opcache.enable=1' >> /usr/local/etc/php/conf.d/opcache.ini && \
+    echo 'display_errors=Off' >> /usr/local/etc/php/conf.d/production.ini && \
+    echo 'log_errors=On' >> /usr/local/etc/php/conf.d/production.ini && \
+    echo 'expose_php=Off' >> /usr/local/etc/php/conf.d/production.ini
 
 WORKDIR /var/www/html
 
-# Use Apache as process manager
-CMD ["apache2-foreground"]
+EXPOSE 8080
+
+# Use PHP built-in server (port 8080 doesn't require root)
+CMD ["php", "-S", "0.0.0.0:8080", "-t", "/var/www/html"]
