@@ -10,10 +10,12 @@ declare(strict_types=1);
 require_once __DIR__ . '/../src/Crypto.php';
 require_once __DIR__ . '/../src/DNS.php';
 require_once __DIR__ . '/../src/Security.php';
+require_once __DIR__ . '/../src/OlaCV.php'; // Add include
 
 use CVerify\Crypto;
 use CVerify\DNS;
 use CVerify\Security;
+use CVerify\OlaCV; // Add use
 
 // Start secure session
 Security::startSecureSession();
@@ -187,6 +189,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $config = [];
             $message = 'Configurazione aziendale resettata.';
             $messageType = 'info';
+            break;
+
+        case 'ola_auto_configure':
+            if (!file_exists(PUBLIC_KEY_FILE) || !file_exists(CONFIG_FILE)) {
+                $message = 'Generate keys first.';
+                $messageType = 'error';
+                break;
+            }
+
+            $apiKey = trim($_POST['api_key'] ?? '');
+            if (empty($apiKey)) {
+                $message = 'OlaCV API Key required.';
+                $messageType = 'error';
+                break;
+            }
+
+            try {
+                $publicKey = file_get_contents(PUBLIC_KEY_FILE);
+                $config = json_decode(file_get_contents(CONFIG_FILE), true);
+                
+                if (!str_ends_with($config['domain'], '.cv')) {
+                    throw new Exception('This feature is only available for .cv domains');
+                }
+
+                $dnsRecords = [
+                    'identity' => $dns->generateDnsRecordForIdentity($config['fingerprint']),
+                    'public_key' => $dns->generateDnsRecordsForKey($publicKey),
+                ];
+
+                $ola = new OlaCV($apiKey);
+                $ola->configureRecords($config['domain'], $dnsRecords);
+
+                $message = '✅ DNS records successfully configured on Ola.cv!';
+                $messageType = 'success';
+                $_POST['action'] = 'show_dns'; 
+                
+            } catch (Exception $e) {
+                $message = 'OlaCV Error: ' . $e->getMessage();
+                $messageType = 'error';
+            }
             break;
     }
 }
@@ -439,6 +481,32 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
             <!-- Record DNS da configurare -->
             <div class="card">
                 <h2>📡 Record DNS da Configurare</h2>
+
+                <!-- NEW: Auto Configure Button -->
+                <?php if (str_ends_with($config['domain'] ?? '', '.cv')): ?>
+                <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div>
+                        <strong style="color: #a78bfa;">Ola.cv Domain Detected!</strong>
+                        <p style="font-size: 0.9em; color: #a0a0a0; margin: 0;">You can configure these records automatically.</p>
+                    </div>
+                    <button type="button" onclick="showOlaPrompt()" class="btn-primary" style="background: #7c3aed;">
+                        ⚡ Auto Configure DNS
+                    </button>
+                </div>
+                <form id="olaForm" method="POST" style="display:none;">
+                    <input type="hidden" name="action" value="ola_auto_configure">
+                    <input type="hidden" name="api_key" id="olaApiKey">
+                </form>
+                <script>
+                function showOlaPrompt() {
+                    const key = prompt("Please enter your Ola.cv API Key to authorize DNS updates:");
+                    if (key) {
+                        document.getElementById('olaApiKey').value = key;
+                        document.getElementById('olaForm').submit();
+                    }
+                }
+                </script>
+                <?php endif; ?>
                 
                 <div class="warning-box">
                     ⚠️ <strong>IMPORTANTE:</strong> I record vanno inseriti sul dominio aziendale 
