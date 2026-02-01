@@ -7,8 +7,8 @@ LABEL description="CVerify Public - User/Company/Verifier portals"
 # Install PHP extensions
 RUN docker-php-ext-install opcache
 
-# Enable Apache modules
-RUN a2enmod rewrite headers ssl
+# Enable Apache modules (no SSL - handled by reverse proxy)
+RUN a2enmod rewrite headers
 
 # Copy public application files (includes src directory)
 COPY public /var/www/html/

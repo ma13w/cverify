@@ -7,8 +7,8 @@ LABEL description="CVerify Relay Server - Central relay for validation requests 
 # Install PHP extensions
 RUN docker-php-ext-install opcache
 
-# Enable Apache modules
-RUN a2enmod rewrite headers ssl
+# Enable Apache modules (no SSL - handled by reverse proxy)
+RUN a2enmod rewrite headers
 
 # Copy application files
 COPY relay-server /var/www/html/
