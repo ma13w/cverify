@@ -114,8 +114,6 @@ cverify/
 - **Attestation:** Company signs the hash of the experience data
 - **Verification:** `Verify(PublicKey, Signature, Hash) = TRUE`
 
-```
-
 ## 🛠️ Installation
 
 ### Requirements
