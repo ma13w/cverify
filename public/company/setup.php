@@ -39,22 +39,30 @@ if (file_exists(CONFIG_FILE)) {
     $config = json_decode(file_get_contents(CONFIG_FILE), true) ?: [];
 }
 
-// Gestione form
+// NUOVO: Il dominio è SEMPRE quello dell'host corrente
+$currentDomain = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+$currentDomain = preg_replace('#^www\.#', '', $currentDomain);
+$currentDomain = preg_replace('#:\d+$#', '', $currentDomain);
+
+if (empty($currentDomain) || $currentDomain === 'localhost') {
+    die('Errore: Dominio non valido. CVerify richiede un dominio reale per funzionare.');
+}
+
+// Verifica che la config esistente corrisponda al dominio corrente
+if (!empty($config['domain']) && $config['domain'] !== $currentDomain) {
+    die('Errore: Questa installazione è configurata per il dominio "' . htmlspecialchars($config['domain']) . '" ma stai accedendo da "' . htmlspecialchars($currentDomain) . '".');
+}
+
+// Gestione form - usa sempre dominio corrente
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
         case 'generate':
-            $domain = trim($_POST['domain'] ?? '');
+            $domain = $currentDomain; // Ignora input, usa dominio host
             $companyName = trim($_POST['company_name'] ?? '');
             $vatNumber = trim($_POST['vat_number'] ?? '');
             $passphrase = $_POST['passphrase'] ?? '';
-
-            if (empty($domain)) {
-                $message = 'Company domain is required.';
-                $messageType = 'error';
-                break;
-            }
 
             if (empty($companyName)) {
                 $message = 'Company name is required.';

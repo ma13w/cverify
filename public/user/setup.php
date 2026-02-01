@@ -38,13 +38,28 @@ if (file_exists(CONFIG_FILE)) {
     $config = json_decode(file_get_contents(CONFIG_FILE), true) ?: [];
 }
 
+// NUOVO: Il dominio è SEMPRE quello dell'host corrente
+$currentDomain = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+$currentDomain = preg_replace('#^www\.#', '', $currentDomain);
+$currentDomain = preg_replace('#:\d+$#', '', $currentDomain);
+
+if (empty($currentDomain) || $currentDomain === 'localhost') {
+    die('Errore: Dominio non valido. CVerify richiede un dominio reale per funzionare.');
+}
+
+// Verifica che la config esistente corrisponda al dominio corrente
+if (!empty($config['domain']) && $config['domain'] !== $currentDomain) {
+    die('Errore: Questa installazione è configurata per il dominio "' . htmlspecialchars($config['domain']) . '" ma stai accedendo da "' . htmlspecialchars($currentDomain) . '".');
+}
+
 // Gestione form
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
     switch ($action) {
         case 'generate':
-            $domain = trim($_POST['domain'] ?? '');
+            // Usa sempre il dominio corrente, ignora input
+            $domain = $currentDomain;
             $ownerName = trim($_POST['owner_name'] ?? '');
             $passphrase = $_POST['passphrase'] ?? '';
 

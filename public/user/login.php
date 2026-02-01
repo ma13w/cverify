@@ -41,9 +41,15 @@ try {
     die('Too many login attempts. Please try again later.');
 }
 
-// Percorsi dati
-$dataDir = __DIR__ . '/data';
-$configFile = $dataDir . '/config.json';
+// NUOVO: Il dominio è SEMPRE quello dell'host corrente
+$domain = $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? '';
+// Rimuovi www. e porta se presente
+$domain = preg_replace('#^www\.#', '', $domain);
+$domain = preg_replace('#:\d+$#', '', $domain);
+
+if (empty($domain) || $domain === 'localhost') {
+    die('Errore: Dominio non valido. CVerify richiede un dominio reale per funzionare.');
+}
 
 // Inizializza Auth
 $auth = new Auth($dataDir);
@@ -54,9 +60,13 @@ if ($auth->isAuthenticated()) {
     exit;
 }
 
-// Carica config se esiste
+// Carica config se esiste e verifica che corrisponda al dominio corrente
 $config = file_exists($configFile) ? json_decode(file_get_contents($configFile), true) : [];
-$domain = $config['domain'] ?? '';
+
+// Se esiste una config ma con dominio diverso, errore
+if (!empty($config['domain']) && $config['domain'] !== $domain) {
+    die('Errore: Questa installazione è configurata per il dominio "' . htmlspecialchars($config['domain']) . '" ma stai accedendo da "' . htmlspecialchars($domain) . '".');
+}
 
 $message = '';
 $messageType = '';
@@ -71,36 +81,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
     try {
         switch ($action) {
             case 'check_dns':
-                $checkDomain = trim($_POST['domain'] ?? $domain);
-                if (empty($checkDomain)) {
-                    throw new Exception('Dominio non specificato');
-                }
-                
-                $result = $auth->isDomainVerified($checkDomain);
+                // Usa sempre il dominio dell'host, ignora qualsiasi input
+                $result = $auth->isDomainVerified($domain);
                 echo json_encode([
                     'success' => true,
+                    'domain' => $domain,
                     'dns' => $result
                 ]);
                 break;
                 
             case 'generate_challenge':
-                $checkDomain = trim($_POST['domain'] ?? $domain);
-                if (empty($checkDomain)) {
-                    throw new Exception('Dominio non specificato');
-                }
-                
-                $result = $auth->generateChallenge($checkDomain);
+                // Usa sempre il dominio dell'host
+                $result = $auth->generateChallenge($domain);
                 echo json_encode($result);
                 break;
                 
             case 'authenticate':
-                $checkDomain = trim($_POST['domain'] ?? $domain);
+                // Usa sempre il dominio dell'host, ignora input domain
                 $privateKey = $_POST['private_key'] ?? '';
                 $passphrase = $_POST['passphrase'] ?? null;
-                
-                if (empty($checkDomain)) {
-                    throw new Exception('Dominio non specificato');
-                }
                 
                 if (empty($privateKey)) {
                     throw new Exception('Chiave privata richiesta');
@@ -114,6 +113,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 
                 $challenge = json_decode(file_get_contents($challengeFile), true);
                 
+                // Verifica che il challenge sia per questo dominio
+                if (($challenge['domain'] ?? '') !== $domain) {
+                    throw new Exception('Challenge non valido per questo dominio');
+                }
+                
                 // Firma il challenge con la chiave privata
                 $crypto = new Crypto();
                 $challengeToSign = $challenge;
@@ -126,23 +130,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 }
                 
                 // Verifica la firma e autentica
-                $result = $auth->authenticate($checkDomain, $signature);
+                $result = $auth->authenticate($domain, $signature);
                 
                 if ($result['success']) {
                     // Salva la configurazione se non esiste
                     if (!file_exists($configFile)) {
                         $newConfig = [
-                            'domain' => $checkDomain,
+                            'domain' => $domain,
                             'created_at' => date('c')
                         ];
                         file_put_contents($configFile, json_encode($newConfig, JSON_PRETTY_PRINT));
                     }
                     // SECURITY WARNING: Storing private key in session is a security risk.
-                    // In production, consider:
-                    // 1. Re-requesting private key for each sensitive operation
-                    // 2. Encrypting the private key with a session-specific key
-                    // 3. Using hardware tokens/TPM
-                    // 4. Time-limited temporary storage with re-authentication
                     $_SESSION['private_key'] = $privateKey;
                     $_SESSION['passphrase'] = $passphrase;
                 }
@@ -160,10 +159,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
     exit;
 }
 
-// Verifica DNS se dominio configurato
-if (!empty($domain)) {
-    $dnsStatus = $auth->isDomainVerified($domain);
-}
+// Verifica DNS per il dominio corrente
+$dnsStatus = $auth->isDomainVerified($domain);
 
 // Gestione messaggi di errore da redirect
 $errorParam = $_GET['error'] ?? '';
@@ -192,15 +189,19 @@ include __DIR__ . '/../includes/header.php';
                 <p class="text-navy-400 mt-2">Accedi con la tua chiave privata RSA</p>
             </div>
             
-            <!-- Step 1: Domain Input -->
-            <div id="step1" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-navy-300 mb-2">Il tuo dominio</label>
-                    <input type="text" id="domainInput" value="<?= htmlspecialchars($domain) ?>" 
-                           placeholder="tuodominio.com"
-                           class="input-field w-full px-4 py-3 rounded-xl text-white placeholder-navy-500">
+            <!-- Domain Display (non modificabile) -->
+            <div class="mb-6 p-4 bg-navy-800/50 rounded-xl border border-navy-700">
+                <div class="flex items-center justify-between">
+                    <span class="text-navy-400 text-sm">Dominio</span>
+                    <span class="text-white font-mono font-medium"><?= htmlspecialchars($domain, ENT_QUOTES) ?></span>
                 </div>
-                
+                <p class="text-navy-500 text-xs mt-2">
+                    Il dominio è determinato automaticamente dall'URL. Per usare un dominio diverso, installa CVerify sul tuo dominio.
+                </p>
+            </div>
+            
+            <!-- Step 1: DNS Check -->
+            <div id="step1" class="space-y-4">
                 <!-- DNS Status -->
                 <div id="dnsStatus" class="hidden">
                     <div class="rounded-xl p-4" id="dnsStatusContent"></div>
@@ -250,11 +251,11 @@ include __DIR__ . '/../includes/header.php';
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                     </svg>
-                    <span>Login</span>
+                    <span>Accedi</span>
                 </button>
                 
                 <button onclick="goBack()" class="btn-secondary w-full px-4 py-3 rounded-xl text-white font-medium">
-                    ← Go Back
+                    ← Torna indietro
                 </button>
             </div>
             
@@ -273,6 +274,8 @@ include __DIR__ . '/../includes/header.php';
 </main>
 
 <script>
+// Il dominio è fisso, determinato dal server
+const domain = '<?= htmlspecialchars($domain, ENT_QUOTES) ?>';
 let currentChallenge = null;
 
 function showMessage(msg, type) {
@@ -286,20 +289,17 @@ function hideMessage() {
     document.getElementById('messageBox').classList.add('hidden');
 }
 
+function goBack() {
+    document.getElementById('step1').classList.remove('hidden');
+    document.getElementById('step2').classList.add('hidden');
+    hideMessage();
+}
+
 async function checkDNSAndGenerateChallenge() {
-    const domain = document.getElementById('domainInput').value.trim();
-    
     console.group('%c🔐 CVerify DNS Authentication', 'color: #3b82f6; font-weight: bold; font-size: 14px;');
-    console.log('%c[Step 1] Inizializzazione verifica DNS', 'color: #60a5fa;');
+    console.log('%c[Step 1] Verifica DNS per dominio fisso', 'color: #60a5fa;');
     console.log('Dominio:', domain);
     console.time('DNS Check Duration');
-    
-    if (!domain) {
-        console.error('❌ Dominio non inserito');
-        console.groupEnd();
-        showMessage('Inserisci il tuo dominio', 'error');
-        return;
-    }
     
     const btn = document.getElementById('checkDnsBtn');
     btn.disabled = true;
@@ -313,7 +313,7 @@ async function checkDNSAndGenerateChallenge() {
         const dnsRes = await fetch('', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            body: new URLSearchParams({ action: 'check_dns', domain })
+            body: new URLSearchParams({ action: 'check_dns' })
         });
         const dnsData = await dnsRes.json();
         
@@ -321,10 +321,9 @@ async function checkDNSAndGenerateChallenge() {
         console.table({
             'Success': dnsData.success,
             'Verified': dnsData.dns?.verified ?? false,
-            'Has Public Key': !!dnsData.dns?.publicKey,
-            'CVerify ID': dnsData.dns?.cverify_id ?? 'N/A'
+            'Has Public Key': !!dnsData.dns?.public_key,
+            'CVerify ID': dnsData.dns?.has_identity ? 'Presente' : 'Assente'
         });
-        console.log('Dettagli completi:', dnsData);
         
         const statusDiv = document.getElementById('dnsStatus');
         const contentDiv = document.getElementById('dnsStatusContent');
@@ -365,16 +364,16 @@ async function checkDNSAndGenerateChallenge() {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="font-medium">DNS Verified</span>
+                <span class="font-medium">DNS Verificato</span>
             </div>
         `;
         
         // Generate challenge
-        console.log('%c[Step 4] Generating cryptographic challenge...', 'color: #fbbf24;');
+        console.log('%c[Step 4] Generazione challenge crittografico...', 'color: #fbbf24;');
         const challengeRes = await fetch('', {
             method: 'POST',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
-            body: new URLSearchParams({ action: 'generate_challenge', domain })
+            body: new URLSearchParams({ action: 'generate_challenge' })
         });
         const challengeData = await challengeRes.json();
         
@@ -391,22 +390,19 @@ async function checkDNSAndGenerateChallenge() {
         }
         
         currentChallenge = challengeData.challenge;
-        console.log('%c✅ Challenge pronto per la firma', 'color: #10b981; font-weight: bold;');
-        console.log('Nonce:', currentChallenge.nonce);
-        console.log('Timestamp:', currentChallenge.timestamp);
-        console.groupEnd();
+        document.getElementById('challengeDisplay').textContent = JSON.stringify(challengeData.challenge, null, 2);
         
         // Show step 2
         document.getElementById('step1').classList.add('hidden');
         document.getElementById('step2').classList.remove('hidden');
         
-        // Display challenge (without expires_at)
-        const displayChallenge = {...currentChallenge};
-        delete displayChallenge.expires_at;
-        document.getElementById('challengeDisplay').textContent = JSON.stringify(displayChallenge, null, 2);
+        console.log('%c✅ Pronto per autenticazione con chiave privata', 'color: #10b981; font-weight: bold;');
+        console.groupEnd();
         
     } catch (err) {
-        showMessage('Errore: ' + err.message, 'error');
+        console.error('❌ Errore di rete:', err);
+        console.groupEnd();
+        showMessage('Errore di rete: ' + err.message, 'error');
     }
     
     btn.disabled = false;
@@ -414,7 +410,6 @@ async function checkDNSAndGenerateChallenge() {
 }
 
 async function authenticate() {
-    const domain = document.getElementById('domainInput').value.trim();
     const privateKey = document.getElementById('privateKeyInput').value.trim();
     const passphrase = document.getElementById('passphraseInput').value;
     
@@ -457,7 +452,6 @@ async function authenticate() {
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: new URLSearchParams({
                 action: 'authenticate',
-                domain,
                 private_key: privateKey,
                 passphrase
             })
@@ -481,10 +475,6 @@ async function authenticate() {
         } else {
             console.error('%c❌ AUTENTICAZIONE FALLITA', 'color: #ef4444; font-weight: bold;');
             console.error('Motivo:', data.error || 'Sconosciuto');
-            console.log('Possibili cause:');
-            console.log('  - Chiave privata non corrisponde alla chiave pubblica nel DNS');
-            console.log('  - Passphrase errata');
-            console.log('  - Challenge scaduto');
             console.timeEnd('Authentication Duration');
             console.groupEnd();
             showMessage(data.error || 'Autenticazione fallita', 'error');
@@ -500,12 +490,6 @@ async function authenticate() {
         btn.disabled = false;
         btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg><span>Accedi</span>';
     }
-}
-
-function goBack() {
-    document.getElementById('step2').classList.add('hidden');
-    document.getElementById('step1').classList.remove('hidden');
-    hideMessage();
 }
 </script>
 
