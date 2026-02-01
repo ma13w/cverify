@@ -1,45 +1,32 @@
-# CVerify - Full Stack Deployment
-# Relay Server + Public Application
 version: "3.8"
 
 services:
-  relay-server:
+  web:
     build:
       context: .
-      dockerfile: ./relay-server/Dockerfile
-    container_name: cverify-relay
-    restart: unless-stopped
+      dockerfile: relay-server/Dockerfile
+    container_name: relay-server
     ports:
-      - "${RELAY_PORT:-7070}:8080"
+      - "7070:80"
     volumes:
-      # Persist relay data
+      - ./relay-server:/var/www/html
       - relay_data:/var/www/html/data
-      # Optional: Custom config
-      - ./relay-server/settings.php:/var/www/html/settings.php:ro
-    environment:
-      - PHP_OPCACHE_ENABLE=1
-      - APACHE_RUN_USER=www-data
-      - APACHE_RUN_GROUP=www-data
-    networks:
-      - cverify-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
-      interval: 30s
-      timeout: 3s
-      retries: 3
-      start_period: 10s
-    labels:
-      - "com.cverify.service=relay"
-      - "com.cverify.description=Central relay server"
+    restart: unless-stopped
 
-networks:
-  cverify-network:
-    driver: bridge
+  public:
+    build:
+      context: .
+      dockerfile: public/Dockerfile
+    container_name: public-app
+    ports:
+      - "9081:80"
+    volumes:
+      - ./public:/var/www/html
+      - user_data:/var/www/html/user/data
+      - company_data:/var/www/html/company/data
+    restart: unless-stopped
 
 volumes:
   relay_data:
-    driver: local
   user_data:
-    driver: local
   company_data:
-    driver: local
