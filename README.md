@@ -114,6 +114,8 @@ cverify/
 - **Attestation:** Company signs the hash of the experience data
 - **Verification:** `Verify(PublicKey, Signature, Hash) = TRUE`
 
+````
+
 ## 🛠️ Installation
 
 ### Requirements
@@ -122,6 +124,13 @@ cverify/
 - **OpenSSL** PHP extension
 - **Web server** (Apache or Nginx)
 - *(Optional)* OlaCV API Key for `.cv` domains
+
+### 🌐 Live Demo & Testing
+
+Try the protocol live on the CVerify network:
+- **Main Portal**: [http://cverify.cv:8080/](http://cverify.cv:8080/)
+- **Test Validation**: Use this signed CV URL to test the verifier:
+  `http://calimatteo.cv:5000/user/cv.json`
 
 ### Setup
 
