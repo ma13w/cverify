@@ -454,8 +454,13 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
             <div class="card">
                 <h2>📡 Record DNS da Configurare</h2>
                 
-                <!-- NEW: Check for .cv domain and show button -->
-                <?php if (str_ends_with($config['domain'] ?? '', '.cv')): ?>
+                <?php 
+                // Controllo sicuro per domini .cv (compatibile con tutte le versioni PHP)
+                $domain = $config['domain'] ?? '';
+                $isCvDomain = (substr($domain, -3) === '.cv');
+                
+                if ($isCvDomain): 
+                ?>
                 <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
                     <div>
                         <strong style="color: #34d399;">Ola.cv Domain Detected!</strong>

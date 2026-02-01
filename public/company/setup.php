@@ -482,8 +482,13 @@ $isConfigured = !empty($config) && isset($_SESSION['private_key']);
             <div class="card">
                 <h2>📡 Record DNS da Configurare</h2>
 
-                <!-- NEW: Auto Configure Button -->
-                <?php if (str_ends_with($config['domain'] ?? '', '.cv')): ?>
+                <?php 
+                // Controllo sicuro per domini .cv
+                $domain = $config['domain'] ?? '';
+                $isCvDomain = (substr($domain, -3) === '.cv');
+                
+                if ($isCvDomain): 
+                ?>
                 <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between;">
                     <div>
                         <strong style="color: #a78bfa;">Ola.cv Domain Detected!</strong>
