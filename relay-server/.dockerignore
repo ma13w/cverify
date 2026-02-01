@@ -1,0 +1,32 @@
+# Exclude from Docker build
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+
+# Data directories (will be created in container)
+data/*
+!data/.gitkeep
+
+# IDE
+.vscode
+.idea
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.env.local

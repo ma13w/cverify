@@ -1,0 +1,50 @@
+# Exclude from Docker build
+
+# Git
+.git
+.gitignore
+
+# Documentation
+README.md
+*.md
+SECURITY_*.md
+CSRF_*.php
+
+# Data directories (will be created/mounted)
+user/data/*
+!user/data/.gitkeep
+company/data/*
+!company/data/.gitkeep
+
+# Private keys (NEVER include in image)
+**/*private_key.pem
+**/*.pem
+**/*.key
+
+# Config files with secrets
+user/data/config.json
+company/data/config.json
+
+# IDE
+.vscode
+.idea
+*.sublime-*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.env
+.env.local
+
+# Test files
+test.php
+examples/

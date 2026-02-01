@@ -1,0 +1,8 @@
+{
+    "authenticated": true,
+    "domain": "wb.info.wf",
+    "authenticated_at": "2026-02-01T11:44:17+01:00",
+    "expires_at": "2026-02-01T12:49:27+01:00",
+    "fingerprint": "6bb61e4d9493b29cb551fabdea242f1ddf438110589ea6b0d724a47ced4f9957",
+    "last_dns_check": "2026-02-01T11:49:23+01:00"
+}
