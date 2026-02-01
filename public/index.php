@@ -17,7 +17,7 @@ include 'includes/header.php';
                         <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                         </svg>
-                        Decentralized & Trustless
+                        <span class="font-mono font-semibold tracking-wide">DNS-BASED PKI &bull; STRONG ENCRYPTION</span>
                     </div>
                     
                     <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
@@ -69,8 +69,8 @@ include 'includes/header.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">DNS Setup</h3>
-                        <p class="text-sm text-navy-400">Configure TXT records with your public key on your domain.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2">DNS Key Publication</h3>
+                        <p class="text-sm text-navy-400">Publish your 2048-bit RSA public key via DNS TXT records. Zero infrastructure required.</p>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-6 text-center relative">
@@ -80,8 +80,8 @@ include 'includes/header.php';
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"/>
                             </svg>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">Request Validation</h3>
-                        <p class="text-sm text-navy-400">The user sends a signed request to the company they worked for.</p>
+                        <h3 class="text-lg font-semibold text-white mb-2">Signed Request</h3>
+                        <p class="text-sm text-navy-400">User cryptographically signs a validation request with their private key.</p>
                     </div>
                     
                     <div class="glass-card rounded-2xl p-6 text-center relative">
@@ -172,7 +172,7 @@ include 'includes/header.php';
                                 <span class="text-3xl font-bold text-white">Free</span>
                                 <span class="text-navy-400 text-sm ml-2">forever</span>
                             </div>
-                            <a href="https://github.com/cverify/cverify" target="_blank" 
+                            <a href="https://github.com/ma13w/cverify" target="_blank" 
                                class="btn-secondary px-6 py-3 rounded-xl text-white font-medium inline-flex items-center space-x-2">
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                                     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
@@ -276,19 +276,12 @@ include 'includes/header.php';
                     </p>
                     
                     <div class="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                        <a href="mailto:hello@cverify.me" 
+                        <a href="mailto:me@calimatteo.it" 
                            class="btn-primary px-8 py-4 rounded-xl text-white font-semibold text-lg inline-flex items-center justify-center space-x-3">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                             </svg>
-                            <span>hello@cverify.me</span>
-                        </a>
-                        <a href="https://t.me/cverify" target="_blank"
-                           class="btn-secondary px-8 py-4 rounded-xl text-white font-medium text-lg inline-flex items-center justify-center space-x-3">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
-                            </svg>
-                            <span>@cverify on Telegram</span>
+                            <span>me@calimatteo.it</span>
                         </a>
                     </div>
                     
@@ -448,44 +441,121 @@ include 'includes/header.php';
         </section>
 
         <!-- Technical Info -->
-        <section class="py-20 border-t border-navy-800/50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section class="py-24 border-t border-navy-800/50 relative overflow-hidden">
+            <div class="absolute inset-0 bg-navy-900/50"></div>
+            <!-- Background Decoration -->
+            <div class="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-emerald-500/5 to-transparent pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-1/3 h-full bg-gradient-to-r from-blue-500/5 to-transparent pointer-events-none"></div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
                 <div class="text-center mb-16">
-                    <h2 class="text-3xl font-bold text-white mb-4">Built on Open Standards</h2>
+                    <h2 class="text-3xl font-bold text-white mb-4">Security Architecture</h2>
                     <p class="text-navy-400 max-w-2xl mx-auto">
-                        CVerify uses proven cryptographic technologies and DNS infrastructure.
+                        A robust, layered security model relying on established cryptographic primitives and the global DNS infrastructure.
                     </p>
                 </div>
                 
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                            </svg>
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <!-- Left: Technical Specs -->
+                    <div class="space-y-6">
+                        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-emerald-500 transition-transform hover:translate-x-2">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.2-2.858.59-4.18"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-bold text-white">DNS Root of Trust</h3>
+                                    <p class="text-navy-400 text-sm mt-1">
+                                        Identity is anchored in the Domain Name System. Public keys are published as TXT records, making the domain owner the only entity capable of signing valid attestations for that organization.
+                                    </p>
+                                    <div class="mt-3 bg-navy-950 rounded px-3 py-2 font-mono text-xs text-emerald-400">
+                                        cverify._domainkey.example.com IN TXT "v=CV1; k=rsa; p=MIIBIjANBg..."
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">RSA-2048</h3>
-                        <p class="text-navy-400 text-sm">Industry standard asymmetric cryptography for digital signatures.</p>
+
+                        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-blue-500 transition-transform hover:translate-x-2">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-bold text-white">Asymmetric Cryptography</h3>
+                                    <p class="text-navy-400 text-sm mt-1">
+                                        We use <strong>RSA-2048</strong> key pairs. The private key never leaves your secure environment. It is used solely to generate digital signatures that any third party can verify using the public key fetched from DNS.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card rounded-2xl p-6 border-l-4 border-l-purple-500 transition-transform hover:translate-x-2">
+                            <div class="flex items-start">
+                                <div class="flex-shrink-0">
+                                    <div class="w-12 h-12 bg-purple-500/10 rounded-xl flex items-center justify-center">
+                                        <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="ml-4">
+                                    <h3 class="text-lg font-bold text-white">Immutable Integrity</h3>
+                                    <p class="text-navy-400 text-sm mt-1">
+                                        Every attestation is hashed using <strong>SHA-256</strong>. Changing even a single bit of the credential data invalidates the signature immediately, guaranteeing document integrity.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                            </svg>
+
+                    <!-- Right: Visual Representation -->
+                    <div class="relative">
+                        <div class="glass-card rounded-2xl p-8 border border-navy-700 bg-navy-900/80">
+                            <div class="space-y-6 font-mono text-sm leading-relaxed">
+                                <div>
+                                    <span class="text-navy-500">// 1. The document is hashed</span><br>
+                                    <span class="text-purple-400">$hash</span> = <span class="text-yellow-400">hash</span>(<span class="text-string">'sha256'</span>, <span class="text-blue-300">$json_data</span>);
+                                </div>
+                                
+                                <div class="pl-4 border-l-2 border-navy-700">
+                                    <span class="text-gray-500">Output:</span> <span class="text-emerald-500">e3b0c44298fc1c149...</span>
+                                </div>
+
+                                <div>
+                                    <span class="text-navy-500">// 2. Hash is signed with Private Key</span><br>
+                                    <span class="text-purple-400">$signature</span> = <span class="text-yellow-400">rsa_sign</span>(<span class="text-purple-400">$hash</span>, <span class="text-red-400">$private_key</span>);
+                                </div>
+
+                                <div>
+                                    <span class="text-navy-500">// 3. Anyone verifies with DNS Public Key</span><br>
+                                    <span class="text-purple-400">$pub_key</span> = <span class="text-yellow-400">dns_get_record</span>(<span class="text-string">'company.com'</span>, DNS_TXT);<br>
+                                    <span class="text-purple-400">$valid</span> = <span class="text-yellow-400">rsa_verify</span>(<span class="text-purple-400">$hash</span>, <span class="text-purple-400">$signature</span>, <span class="text-purple-400">$pub_key</span>);
+                                </div>
+
+                                <div class="text-center pt-4">
+                                    <div class="inline-flex items-center space-x-2 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-full border border-emerald-500/20">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <span class="font-bold">VERIFIED_TRUE</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">DNS TXT Records</h3>
-                        <p class="text-navy-400 text-sm">Public keys published in DNS, verifiable by anyone globally.</p>
-                    </div>
-                    
-                    <div class="glass-card rounded-2xl p-6">
-                        <div class="w-12 h-12 bg-emerald-500/20 rounded-xl flex items-center justify-center mb-4">
-                            <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
-                            </svg>
+                        
+                        <!-- Floating Verification Badge (decoration) -->
+                        <div class="absolute -bottom-6 -right-6 glass-card p-4 rounded-xl border border-emerald-500/30 bg-navy-900 animate-pulse hidden lg:block">
+                             <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-emerald-500 rounded-full"></div>
+                                <span class="text-emerald-400 font-mono text-xs">NO CENTRAL AUTHORITY</span>
+                             </div>
                         </div>
-                        <h3 class="text-lg font-semibold text-white mb-2">SHA-256</h3>
-                        <p class="text-navy-400 text-sm">Cryptographic hashing for data integrity and fingerprinting.</p>
                     </div>
                 </div>
             </div>

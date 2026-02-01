@@ -460,29 +460,6 @@ include __DIR__ . '/../includes/header.php';
                     </div>
                 </div>
 
-                <!-- Stats -->
-                <div class="glass-card rounded-2xl p-6">
-                    <h2 class="text-lg font-semibold text-white mb-4">Statistiche CV</h2>
-                    <?php
-                    $totalExp = count($cv['experiences']);
-                    $validatedExp = count(array_filter($cv['experiences'], fn($e) => $e['validated']));
-                    $pendingExp = $totalExp - $validatedExp;
-                    ?>
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white"><?= $totalExp ?></div>
-                            <div class="text-xs text-navy-400">Totali</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-emerald-400"><?= $validatedExp ?></div>
-                            <div class="text-xs text-navy-400">Validate</div>
-                        </div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-yellow-400"><?= $pendingExp ?></div>
-                            <div class="text-xs text-navy-400">In Attesa</div>
-                        </div>
-                    </div>
-                </div>
                 
                 <!-- Sync Attestations -->
                 <div class="glass-card rounded-2xl p-6">
