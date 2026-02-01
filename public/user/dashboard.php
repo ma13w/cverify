@@ -168,24 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                     throw new Exception('Domain not configured');
                 }
                 
-                // Retrieve attestations from Relay Server
-                $url = RELAY_SERVER_URL . '/api/attestations.php?domain=' . urlencode($userDomain);
-                $ch = curl_init($url);
-                curl_setopt_array($ch, [
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_TIMEOUT => HTTP_TIMEOUT
-                ]);
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-                
-                if ($httpCode !== 200) {
-                    throw new Exception('Error retrieving attestations');
-                }
-                
-                $data = json_decode($response, true);
-                $attestations = $data['attestations'] ?? [];
-                
                 // Decripta attestazioni criptate e carica chiave privata
                 $privateKey = $_SESSION['private_key'] ?? null;
                 $passPhrase = $_SESSION['passphrase'] ?? null;
@@ -193,7 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                     throw new Exception('Private key not available');
                 }
                 
-                $companyDomain = $session['domain'] ?? $config['domain'] ?? '';
+                $companyDomain = $exp['company_domain'];
                 $companyPublicKey = null;
                 try {
                     $companyPublicKey = $dns->getPublicKeyFromDNS($companyDomain);
@@ -215,21 +197,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                     'timestamp' => date('c')
                 ];
 
-                // Rimuovi: Se l'azienda ha una chiave pubblica, cripta i dati sensibili
-                // if ($companyPublicKey) {
-                //     $sensitiveData = [
-                //         'experience_id' => $exp['id'],
-                //         'experience_data' => $requestData['experience_data'],
-                //         'user_public_key' => $config['public_key'] ?? null,
-                //         'timestamp' => date('c')
-                //     ];
-                //     $encryptedPayload = $crypto->encryptForRecipient($sensitiveData, $companyPublicKey);
-                //     $requestData['encrypted_payload'] = $encryptedPayload;
-                //     $requestData['encrypted'] = true;
-                // } else {
-                //     // Invia in chiaro
-                // }
-
                 // Invia sempre in chiaro
                 $requestData['encrypted'] = false;
 
@@ -244,11 +211,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 ]);
                 $response = curl_exec($ch);
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                $curlError = curl_error($ch);
                 curl_close($ch);
                 
                 if ($httpCode !== 200) {
                     $error = json_decode($response, true);
-                    throw new Exception($error['error'] ?? 'Errore invio al relay server');
+                    $rawMsg = $error['error'] ?? null;
+                    if (!$rawMsg) {
+                        $rawMsg = 'Raw: ' . substr($response, 0, 200);
+                    }
+                    $msg = $rawMsg ?: 'Errore invio al relay server';
+                    
+                    if ($curlError) {
+                        $msg .= " (Curl: $curlError)";
+                    } elseif ($httpCode === 0) {
+                        $msg .= " (Connection failed)";
+                    } else {
+                        $msg .= " (HTTP $httpCode)";
+                    }
+                    
+                    throw new Exception($msg);
                 }
                 
                 $relayResponse = json_decode($response, true);
@@ -288,75 +270,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
                 // Decripta attestazioni criptate e carica chiave privata
                 $privateKey = $_SESSION['private_key'] ?? null;
                 $passPhrase = $_SESSION['passphrase'] ?? null;
-                if (!$privateKey || !$passPhrase) {
-                    throw new Exception('Private key not available');
+                
+                $matched = 0;
+                
+                foreach ($attestations as $att) {
+                    // Skip if no experience_id found (unless encrypted, which we handle later if possible)
+                    if (empty($att['experience_id'])) {
+                        // TODO: Handle encrypted attestations matching logic if needed
+                        continue;
+                    }
+                    
+                    // Find corresponding experience
+                    foreach ($cv['experiences'] as &$e) {
+                        if ($e['id'] === $att['experience_id']) {
+                            // Match found!
+                            if (empty($e['validated']) || !$e['validated']) {
+                                $e['validated'] = true;
+                                $e['attestation'] = $att;
+                                $e['validated_at'] = date('c');
+                                $matched++;
+                            }
+                            break;
+                        }
+                    }
                 }
                 
-                $companyDomain = $session['domain'] ?? $config['domain'] ?? '';
-                $companyPublicKey = null;
-                try {
-                    $companyPublicKey = $dns->getPublicKeyFromDNS($companyDomain);
-                } catch (Exception $e) {
-                    // Azienda non ha chiave DNS, invieremo in chiaro
+                if ($matched > 0) {
+                    file_put_contents($cvFile, json_encode($cv, JSON_PRETTY_PRINT));
                 }
-                
-                // Prepara i dati della richiesta
-                $requestData = [
-                    'user_domain' => $userDomain,
-                    'company_domain' => $companyDomain,
-                    'experience_id' => $exp['id'],
-                    'experience_data' => [
-                        'role' => $exp['role'],
-                        'description' => $exp['description'] ?? '',
-                        'start_date' => $exp['start_date'],
-                        'end_date' => $exp['end_date']
-                    ],
-                    'timestamp' => date('c')
-                ];
-
-                // Rimuovi: Se l'azienda ha una chiave pubblica, cripta i dati sensibili
-                // if ($companyPublicKey) {
-                //     $sensitiveData = [
-                //         'experience_id' => $exp['id'],
-                //         'experience_data' => $requestData['experience_data'],
-                //         'user_public_key' => $config['public_key'] ?? null,
-                //         'timestamp' => date('c')
-                //     ];
-                //     $encryptedPayload = $crypto->encryptForRecipient($sensitiveData, $companyPublicKey);
-                //     $requestData['encrypted_payload'] = $encryptedPayload;
-                //     $requestData['encrypted'] = true;
-                // } else {
-                //     // Invia in chiaro
-                // }
-
-                // Invia sempre in chiaro
-                $requestData['encrypted'] = false;
-
-                // Invia al Relay Server
-                $ch = curl_init(RELAY_SERVER_URL . '/api/request.php');
-                curl_setopt_array($ch, [
-                    CURLOPT_POST => true,
-                    CURLOPT_POSTFIELDS => json_encode($requestData),
-                    CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_TIMEOUT => HTTP_TIMEOUT
-                ]);
-                $response = curl_exec($ch);
-                $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-                curl_close($ch);
-                
-                if ($httpCode !== 200) {
-                    $error = json_decode($response, true);
-                    throw new Exception($error['error'] ?? 'Errore invio al relay server');
-                }
-                
-                $relayResponse = json_decode($response, true);
                 
                 echo json_encode([
                     'success' => true,
-                    'message' => 'Richiesta inviata al relay server',
-                    'encrypted' => $companyPublicKey !== null,
-                    'request_id' => $relayResponse['request_id'] ?? null
+                    'count' => count($attestations),
+                    'matched' => $matched,
+                    'message' => "Trovate " . count($attestations) . " attestazioni, $matched nuove validate."
                 ]);
                 break;
                 

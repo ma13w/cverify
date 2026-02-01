@@ -10,7 +10,6 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../config.php';
-require_once __DIR__ . '/../../src/Security.php';
 
 use CVerify\Security;
 
@@ -50,8 +49,12 @@ foreach ($required as $field) {
     }
 }
 
-$userDomain = sanitizeDomain($data['user_domain']);
-$companyDomain = sanitizeDomain($data['company_domain']);
+try {
+    $userDomain = sanitizeDomain($data['user_domain']);
+    $companyDomain = sanitizeDomain($data['company_domain']);
+} catch (InvalidArgumentException $e) {
+    errorResponse('Dominio non valido: ' . $e->getMessage());
+}
 
 // Create company pending directory
 $companyDir = PENDING_DIR . '/' . $companyDomain;

@@ -4,7 +4,7 @@
  */
 declare(strict_types=1);
 
-require_once __DIR__ . '/../public/src/Security.php';
+require_once __DIR__ . '/src/Security.php';
 
 use CVerify\Security;
 

@@ -36,6 +36,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_SERVER['HTTP_X_REQUESTED_W
         
         // Verifica identità utente via DNS
         $userDomain = $cv['domain'] ?? $cv['owner_domain'] ?? null;
+
+        // Fix: Se il dominio non è nel JSON, estrailo dall'URL
+        if (empty($userDomain)) {
+            $host = parse_url($url, PHP_URL_HOST);
+            if ($host) {
+                $userDomain = $host;
+                $cv['domain'] = $host; // Aggiorna anche per il frontend
+            }
+        }
+
         $identityResult = verifyUserIdentity($userDomain);
         
         // Verifica ogni esperienza/attestazione
