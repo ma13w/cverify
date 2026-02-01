@@ -11,10 +11,10 @@ RUN docker-php-ext-install opcache
 RUN a2enmod rewrite headers ssl
 
 # Copy application files
-COPY ./relay-server /var/www/html/
+COPY relay-server /var/www/html/
 
 # Copy shared src directory
-COPY ./src /var/www/html/../src/
+COPY src /var/www/html/../src/
 
 # Create data directories with proper permissions
 RUN mkdir -p /var/www/html/data/pending \
